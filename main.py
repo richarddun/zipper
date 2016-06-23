@@ -6,15 +6,20 @@ from kivy.uix.widget import Widget
 #from kivy.metrics import sp
 from kivy.clock import Clock
 #from kivy.utils import platform
-
 #import pytmx
 
 class ZippyApp(App):
     def build(self):
+        baselayer = ZippyBase()
         sprite = Player_Sprite(source='animation\/transparent\/walk_1.png')
-        map = ZippyMap()
+        map = ZippyMap(source='maps\/prototype1\/basic16px-680x800_metal.png')
+        baselayer.add_widget(map)
         map.add_widget(sprite)
-        return map
+        return baselayer
+
+class ZippyBase(Widget):
+    def __init__(self, **kwargs):
+        super(ZippyBase,self).__init__(**kwargs)
 
 class ZippyMap(Image):
     def __init__(self,**kwargs):
@@ -24,46 +29,33 @@ class ZippyMap(Image):
 class Player_Sprite(Image):
     def __init__(self,**kwargs):
         super(Player_Sprite,self).__init__(**kwargs)
+        self.xval = 1
         self._keyboard = Window.request_keyboard(None, self)
-
-        if not self._keyboard:
+        if not self._keyboard:#if the keyboard fails
             return
         self._keyboard.bind(on_key_down=self.on_keyboard_down)
+        self.frametrigger = Clock.create_trigger(self.frametick)
 
     def on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        val = keycode[1]
+        if val == 'left':
+            if self.x > 0:
+                self.xval -= 10
+        elif val == 'right':
+            self.xval += 10
+        self.frametrigger()
 
-        self.animleft = Animation(x = self.x-30, y = self.y, duration=.06)
-        self.animrigt = Animation(x = self.x+30, y = self.y, duration=.06)
-        self.animup = Animation(x = self.x, y = self.y+30, duration = .06)
-        self.animdown = Animation(x = self.x, y = self.y-30, duration = .06)
-        self.animdowl = Animation(x = self.x-30, y = self.y-30, duration = .06)
-        self.animdowr = Animation(x = self.x+30, y = self.y-30, duration = .06)
-        self.animuple = Animation(x = self.x-30, y = self.y+30, duration = .06)
-        self.anumupri = Animation(x = self.x+30, y = self.y+30, duration = .06)
-
-        if keycode[1] == 'left' and self.x > 0:
-            if keycode[1] == 'down':
-                self.animdowl.start(self)
-                self.x -= 30
-                self.y += 30
-            else:
-                self.animleft.start(self)
-                self.x -= 5
-            print str(self.x)
-        elif keycode[1] == 'right' and self.x < 500:
-            self.animrigt.start(self)
-            self.x += 5
-            print str(self.x)
-        elif keycode[1] == 'up':
-            self.animup.start(self)
-            self.y += 5
-        elif keycode[1] == 'down':
-            if self.y >= 5:
-                self.animdown.start(self)
-                self.y -= 5
-        else:
-            return False
-        return True
+    def frametick(self, *ignore):
+        self.x = self.xval
 
 ZippyApp().run()
 
+        #leaving this here for later...
+        #self.animleft = Animation(x = self.x-30, y = self.y, duration=.06)
+        #self.animrigt = Animation(x = self.x+30, y = self.y, duration=.06)
+        #self.animup = Animation(x = self.x, y = self.y+30, duration = .06)
+        #self.animdown = Animation(x = self.x, y = self.y-30, duration = .06)
+        #self.animdowl = Animation(x = self.x-30, y = self.y-30, duration = .06)
+        #self.animdowr = Animation(x = self.x+30, y = self.y-30, duration = .06)
+        #self.animuple = Animation(x = self.x-30, y = self.y+30, duration = .06)
+        #self.anumupri = Animation(x = self.x+30, y = self.y+30, duration = .06)
