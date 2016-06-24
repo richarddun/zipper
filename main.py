@@ -41,7 +41,8 @@ class Player_Sprite(Image):
         self.images = Atlas('animation/animatlas/myatlas.atlas')
         self.texture = self.images['walk_1_right']
         Clock.schedule_interval(self.update, 1.0/60.0)
-        self.step = 0
+        Clock.schedule_interval(self.updatewalk1, .2)
+        Clock.schedule_interval(self.updatewalk2, .2a)
     def update(self, *ignore):
         dx = 0
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
@@ -49,23 +50,21 @@ class Player_Sprite(Image):
             self.resting = False
         elif keys.get(Keyboard.keycodes['left']):
             dx -= 2 * params.scale
-            if self.step == 0:
-                self.texture = self.images['walk_1_left']
-                self.step = 1
-            elif self.step == 1:
-                self.texture = self.images['walk_2_left']
-                self.step = 0
         elif keys.get(Keyboard.keycodes['right']):
             dx += 2 * params.scale
-            if self.step == 0:
-                self.texture = self.images['walk_1_right']
-                self.step = 1
-            elif self.step == 1:
-                self.texture = self.images['walk_2_right']
-                self.step = 0
-
-
         self.x += dx
+
+    def updatewalk1(self, *ignore):
+        if keys.get(Keyboard.keycodes['left']):
+            self.texture = self.images['walk_2_left']
+        elif keys.get(Keyboard.keycodes['right']):
+            self.texture = self.images['walk_2_right']
+
+    def updatewalk2(self, *ignore):
+         if keys.get(Keyboard.keycodes['left']):
+            self.texture = self.images['walk_1_left']
+         elif keys.get(Keyboard.keycodes['right']):
+            self.texture = self.images['walk_1_right']
 
 params = params()
 
