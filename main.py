@@ -1,12 +1,16 @@
 from kivy.app import App
-from kivy.core.window import Window
+from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
+from kivy.atlas import Atlas
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 #from kivy.metrics import sp
 from kivy.clock import Clock
 #from kivy.utils import platform
 #import pytmx
+from collections import defaultdict
+
+keys = defaultdict(lambda: False)
 
 class ZippyApp(App):
     def build(self):
@@ -21,6 +25,11 @@ class ZippyBase(Widget):
     def __init__(self, **kwargs):
         super(ZippyBase,self).__init__(**kwargs)
 
+class params(object):
+    def __init__(self):
+        self.width, self.height = Window.size
+        self.scale = self.height / 252.      # 21 tile size * 12
+
 class ZippyMap(Image):
     def __init__(self,**kwargs):
         super(ZippyMap,self).__init__(**kwargs)
@@ -29,26 +38,44 @@ class ZippyMap(Image):
 class Player_Sprite(Image):
     def __init__(self,**kwargs):
         super(Player_Sprite,self).__init__(**kwargs)
-        self.xval = 1
-        self._keyboard = Window.request_keyboard(None, self)
-        if not self._keyboard:#if the keyboard fails
-            return
-        self._keyboard.bind(on_key_down=self.on_keyboard_down)
-        self.frametrigger = Clock.create_trigger(self.frametick)
+        self.images = Atlas('animation/animatlas/myatlas.atlas')
+        self.texture = self.images['walk_1_right']
+        Clock.schedule_interval(self.update, 1.0/60.0)
+        self.step = 0
+    def update(self, *ignore):
+        dx = 0
+        if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
+            self.dy = 9 * params.scale
+            self.resting = False
+        elif keys.get(Keyboard.keycodes['left']):
+            dx -= 2 * params.scale
+            if self.step == 0:
+                self.texture = self.images['walk_1_left']
+                self.step = 1
+            elif self.step == 1:
+                self.texture = self.images['walk_2_left']
+                self.step = 0
+        elif keys.get(Keyboard.keycodes['right']):
+            dx += 2 * params.scale
+            if self.step == 0:
+                self.texture = self.images['walk_1_right']
+                self.step = 1
+            elif self.step == 1:
+                self.texture = self.images['walk_2_right']
+                self.step = 0
 
-    def on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        val = keycode[1]
-        if val == 'left':
-            if self.x > 0:
-                self.xval -= 10
-        elif val == 'right':
-            self.xval += 10
-        self.frametrigger()
 
-    def frametick(self, *ignore):
-        self.x = self.xval
+        self.x += dx
 
-ZippyApp().run()
+params = params()
+
+if __name__ == '__main__':
+    def on_key_down(window, keycode, *rest):
+        keys[keycode] = True
+    def on_key_up(window, keycode, *rest):
+        keys[keycode] = False
+    Window.bind(on_key_down=on_key_down, on_key_up=on_key_up)
+    ZippyApp().run()
 
         #leaving this here for later...
         #self.animleft = Animation(x = self.x-30, y = self.y, duration=.06)
