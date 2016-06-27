@@ -16,7 +16,7 @@ class ZippyApp(App):
     def build(self):
         baselayer = ZippyBase()
         sprite = Player_Sprite(source='animation\/transparent\/walk_1.png')
-        map = ZippyMap(source='maps\/prototype1\/basic16px-680x800_metal.png')
+        map = ZippyMap(source='maps\/prototype1\/basic16px-680x800_metal.png',allow_stretch=True)
         baselayer.add_widget(map)
         map.add_widget(sprite)
         return baselayer
@@ -40,31 +40,41 @@ class Player_Sprite(Image):
         super(Player_Sprite,self).__init__(**kwargs)
         self.images = Atlas('animation/animatlas/myatlas.atlas')
         self.texture = self.images['walk_1_right']
+        self.rightick = 0
+        self.leftick = 0
+        self.moving_right = False
+        self.moving_left = False
         Clock.schedule_interval(self.update, 1.0/60.0)
-        Clock.schedule_interval(self.updatewalk1, .2)
-        Clock.schedule_interval(self.updatewalk2, .2a)
+
     def update(self, *ignore):
         dx = 0
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
             self.dy = 9 * params.scale
             self.resting = False
-        elif keys.get(Keyboard.keycodes['left']):
+        elif keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
             dx -= 2 * params.scale
-        elif keys.get(Keyboard.keycodes['right']):
+            self.moving_left = True
+        elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
             dx += 2 * params.scale
+            self.moving_right = True
+        elif (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+            self.moving_left, self.moving_right = False,False
+        elif not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+            if self.moving_left:
+                self.texture = self.images['walk_1_left']
+                self.moving_left = False
+            elif self.moving_right:
+                self.texture = self.images['walk_1_right']
+                self.moving_right = False
+        if self.moving_left:
+            self.texture = self.images['walk_2_left']
+        if self.moving_right:
+            self.texture = self.images['walk_2_right']
         self.x += dx
 
-    def updatewalk1(self, *ignore):
-        if keys.get(Keyboard.keycodes['left']):
-            self.texture = self.images['walk_2_left']
-        elif keys.get(Keyboard.keycodes['right']):
-            self.texture = self.images['walk_2_right']
 
-    def updatewalk2(self, *ignore):
-         if keys.get(Keyboard.keycodes['left']):
-            self.texture = self.images['walk_1_left']
-         elif keys.get(Keyboard.keycodes['right']):
-            self.texture = self.images['walk_1_right']
+
+
 
 params = params()
 
