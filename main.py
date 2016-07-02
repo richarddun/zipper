@@ -38,43 +38,59 @@ class ZippyMap(Image):
 class Player_Sprite(Image):
     def __init__(self,**kwargs):
         super(Player_Sprite,self).__init__(**kwargs)
+
         self.images = Atlas('animation/animatlas/myatlas.atlas')
         self.texture = self.images['walk_1_right']
         self.rightick = 0
         self.leftick = 0
         self.moving_right = False
+        self.resting = True
         self.moving_left = False
+        self.maxjump = 10 * params.scale
+        self.jumping = False
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
-        dx = 0
+        dx,self.dy = 0,0
+
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
-            self.dy = 9 * params.scale
+            self.jumping = True
             self.resting = False
-        elif keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
-            dx -= 2 * params.scale
+            self.dy = 2 * params.scale
+        elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
+            self.dy = 2 * params.scale
+        elif self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
+            self.jumping = False
+        elif self.jumping == False and self.y > 0:
+            self.dy -= 3 * params.scale
+        elif self.jumping == False and self.y <= 0:
+            self.resting = True
+        if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
+            dx -= 4 * params.scale
             self.moving_left = True
+            self.moving_right = False
         elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
-            dx += 2 * params.scale
+            dx += 4 * params.scale
             self.moving_right = True
+            self.moving_left = False
         elif (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
             self.moving_left, self.moving_right = False,False
-        elif not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+        elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
             if self.moving_left:
                 self.texture = self.images['walk_1_left']
                 self.moving_left = False
             elif self.moving_right:
                 self.texture = self.images['walk_1_right']
                 self.moving_right = False
+
         if self.moving_left:
             self.texture = self.images['walk_2_left']
         if self.moving_right:
             self.texture = self.images['walk_2_right']
+
+
         self.x += dx
-
-
-
-
+        self.y += self.dy
 
 params = params()
 
@@ -86,12 +102,3 @@ if __name__ == '__main__':
     Window.bind(on_key_down=on_key_down, on_key_up=on_key_up)
     ZippyApp().run()
 
-        #leaving this here for later...
-        #self.animleft = Animation(x = self.x-30, y = self.y, duration=.06)
-        #self.animrigt = Animation(x = self.x+30, y = self.y, duration=.06)
-        #self.animup = Animation(x = self.x, y = self.y+30, duration = .06)
-        #self.animdown = Animation(x = self.x, y = self.y-30, duration = .06)
-        #self.animdowl = Animation(x = self.x-30, y = self.y-30, duration = .06)
-        #self.animdowr = Animation(x = self.x+30, y = self.y-30, duration = .06)
-        #self.animuple = Animation(x = self.x-30, y = self.y+30, duration = .06)
-        #self.anumupri = Animation(x = self.x+30, y = self.y+30, duration = .06)
