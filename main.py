@@ -47,6 +47,7 @@ class Player_Sprite(Image):
         self.resting = True
         self.moving_left = False
         self.maxjump = 10 * params.scale
+        self.movyval = 0
         self.jumping = False
 
     def update(self, *ignore):
@@ -55,21 +56,27 @@ class Player_Sprite(Image):
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
             self.jumping = True
             self.resting = False
-            self.dy = 2 * params.scale
+            self.dy = 5 * params.scale
         elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
-            self.dy = 2 * params.scale
+            if self.movyval > 20:
+                self.jumping = False
+                self.movyval = 0
+            else:
+                self.dy = 5 * params.scale
+                self.movyval += .5
         elif self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
             self.jumping = False
+            self.movyval = 0
         elif self.jumping == False and self.y > 0:
-            self.dy -= 3 * params.scale
+            self.dy -= 6 * params.scale
         elif self.jumping == False and self.y <= 0:
             self.resting = True
         if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
-            dx -= 4 * params.scale
+            dx -= 5 * params.scale
             self.moving_left = True
             self.moving_right = False
         elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
-            dx += 4 * params.scale
+            dx += 5 * params.scale
             self.moving_right = True
             self.moving_left = False
         elif (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
