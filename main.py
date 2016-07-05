@@ -38,7 +38,7 @@ class params(object):
 class Player_Sprite(Image):
     def __init__(self,pos,mapz,**kwargs):
         super(Player_Sprite,self).__init__(pos=pos,**kwargs)
-        self.images = Atlas('animation/animatlas/myatlas.atlas')
+        self.images = Atlas('animation/animatlas/zipperanimatlas.atlas')
         self.map = mapz
         self.texture = self.images['walk_1_right']
         self.rightick = 0
@@ -61,14 +61,30 @@ class Player_Sprite(Image):
             if self.movyval > 20:
                 self.jumping = False
                 self.movyval = 0
+                if self.moving_right:
+                    self.texture = self.images['walk_2_right']
+                elif self.moving_left:
+                    self.texture = self.images['walk_2_left']
+                self.dy -= 6 * params.scale
             else:
+                if self.moving_right:
+                    self.texture = self.images['jump_r']
+                elif self.moving_left:
+                    self.texture = self.images['jump_l']
                 self.dy = 5 * params.scale
                 self.movyval += .5
         elif self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
             self.jumping = False
             self.movyval = 0
         elif self.jumping == False and self.y > 0:
-            self.dy -= 6 * params.scale
+            if self.moving_right:
+                self.texture = self.images['walk_2_right']
+                self.dy -= 6 * params.scale
+            elif self.moving_left:
+                self.texture = self.images['walk_2_left']
+                self.dy -= 6 * params.scale
+            else:
+                self.dy -= 6 * params.scale
         elif self.jumping == False and self.y <= 0:
             self.resting = True
         if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
@@ -89,9 +105,15 @@ class Player_Sprite(Image):
                 self.texture = self.images['walk_1_right']
                 self.moving_right = False
         if self.moving_left:
-            self.texture = self.images['walk_2_left']
+            if self.jumping:
+                self.texture = self.images['jump_l']
+            else:
+                self.texture = self.images['walk_2_left']
         if self.moving_right:
-            self.texture = self.images['walk_2_right']
+            if self.jumping:
+                self.texture = self.images['jump_r']
+            else:
+                self.texture = self.images['walk_2_right']
         self.x += dx
         self.y += self.dy
         new = Rect(*(self.pos + self.size))
