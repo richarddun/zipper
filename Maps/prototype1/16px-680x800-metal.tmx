@@ -23,8 +23,8 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="blocker">
-  <object id="19" name="platform" x="369.269" y="353.083" width="157.344" height="13.9276">
+ <objectgroup name="blocker" visible="0">
+  <object id="19" name="platform" x="369.269" y="353.083" width="157.344" height="13.9276" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
@@ -55,12 +55,12 @@
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="28" name="mound" x="626.84" y="706.388" width="58.0702" height="74.7753">
+  <object id="28" name="mound" x="626.84" y="706.388" width="58.0702" height="74.7753" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="30" name="mound" x="592.926" y="751.994" width="32.5069" height="29.9064">
+  <object id="30" name="mound" x="592.926" y="751.994" width="32.5069" height="29.9064" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
