@@ -18,7 +18,9 @@ class ZippyGame(Widget):
     def __init__(self, **kwargs):
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
-        self.map = tmx.TileMapWidget('\users\/richarddun\dropbox\project_alpha\zipper\Maps\prototype1\/16px-680x800-metal.tmx',Window.size,tempscale)
+        self.map = tmx.TileMapWidget(
+            '\users\/richarddun\dropbox\project_alpha\zipper\Maps\prototype1\/16px-680x800-metal.tmx',
+            Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
         self.add_widget(self.map)
@@ -89,15 +91,18 @@ class Player_Sprite(Image):
                 self.dy -= 6 * params.scale
             else:
                 self.dy -= 6 * params.scale
-        if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
+        if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
+                keys.get(Keyboard.keycodes['right']):
             dx -= 5 * params.scale
             self.moving_left = True
             self.moving_right = False
-        elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
+        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
+                keys.get(Keyboard.keycodes['left']):
             dx += 5 * params.scale
             self.moving_right = True
             self.moving_left = False
-        elif (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
+                keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']):
             self.moving_left, self.moving_right = False,False
         elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
             if self.moving_left and self.resting:
@@ -138,8 +143,7 @@ class Player_Sprite(Image):
             if 'r' in blocker and last.left >= cell.right and new.left < cell.right:
                 new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
         self.pos = new.bottomleft[0]-self.width*.42, new.bottomleft[1]
-# TODO - figure out the reason for the image to not be flush with top blockers or bottom blockers
-# It looks like it is an image rendering issue
+
 params = params()
 
 if __name__ == '__main__':
