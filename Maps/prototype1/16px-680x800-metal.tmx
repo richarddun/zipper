@@ -35,7 +35,7 @@
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="22" name="platform" x="1.59096" y="783.549" width="1260.04" height="11.9322" visible="0">
+  <object id="22" name="platform" x="1.4044" y="784.098" width="1260.04" height="13.622" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
@@ -50,22 +50,22 @@
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="27" name="column" x="945.828" y="431.947" width="75.5708" height="350.807" visible="0">
+  <object id="27" name="column" x="943.79" y="431.947" width="80.0328" height="352.151" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="28" name="mound" x="626.84" y="706.388" width="58.0702" height="74.7753" visible="0">
+  <object id="28" name="mound" x="623.846" y="702.759" width="63.6158" height="80.5925" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="30" name="mound" x="592.926" y="751.994" width="32.5069" height="29.9064" visible="0">
+  <object id="30" name="mound" x="592.318" y="752.383" width="31.3415" height="31.5693" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="31" name="platform" x="192.441" y="625" width="238.818" height="30.3398" visible="0">
+  <object id="31" name="platform" x="192.441" y="623.659" width="238.818" height="31.6807" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>

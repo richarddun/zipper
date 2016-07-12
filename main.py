@@ -32,12 +32,12 @@ class ZippyGame(Widget):
 class params(object):
     def __init__(self):
         self.width, self.height = Window.size
-        self.scale = self.height / 252.      # 21 tile size * 12
+        self.scale = self.height / 256.      # 21 tile size * 12
 
 class Player_Sprite(Image):
     def __init__(self,pos,mapz,**kwargs):
-        super(Player_Sprite,self).__init__(pos=pos,**kwargs)  #size=(145,80),
-        self.mov_images = Atlas('animation/dup/dupdup/zipperanimatlas.atlas')
+        super(Player_Sprite,self).__init__(pos=pos, size=(193,81),*kwargs)
+        self.mov_images = Atlas("animation\/animatlas\/animatlas.atlas")
         self.map = mapz
         self.texture = self.mov_images['walk_1_right']
         self.moving_right = False
@@ -46,11 +46,13 @@ class Player_Sprite(Image):
         self.movyval = 0
         self.suspended = 0
         self.jumping = False
+        print self.texture_size
 
 
     def update(self, *ignore):
-        dx,self.dy = 0,0
-        last = Rect(*(self.pos + self.size))#Rect(self.pos[0]+(self.width*.25),self.pos[1], (self.size[0]*.47), self.size[1])
+        dx, self.dy = 0, 0
+        # last = Rect(*(self.pos + self.size))
+        last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
             if self.moving_right:
                 self.texture = self.mov_images['walk_2_right']
@@ -116,8 +118,11 @@ class Player_Sprite(Image):
                 self.texture = self.mov_images['walk_2_right']
         self.x += dx
         self.y += self.dy
-        new = Rect(*(self.pos + self.size))
-        #new=Rect(self.pos[0]+(self.width*.25),self.pos[1], (self.size[0]*.47), self.size[1])
+        # new = Rect(*(self.pos + self.size))
+        new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
+        """Rect instantiated with x set to where character drawing is, relative to the
+         overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
+         collision as the character drawing is centered within a larger transparent image"""
         for cell in self.map.map.layers['blocker'].collide(new, 'blocker'):
             blocker = cell['blocker']
             if 't' in blocker and last.bottom >= cell.top and new.bottom < cell.top:
@@ -129,12 +134,12 @@ class Player_Sprite(Image):
                 self.dy = 0
                 self.suspended = 0
             if 'l' in blocker and last.right <= cell.left and new.right > cell.left:
-                new.right = cell.left-1
+                new.right = cell.left-1  # 1 pixel for padding, to prevent corner sticking
             if 'r' in blocker and last.left >= cell.right and new.left < cell.right:
-                new.left = cell.right+1
-
-        self.pos = new.bottomleft#[0]-self.width*.25, new.bottomleft[1]
-
+                new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
+        self.pos = new.bottomleft[0]-self.width*.42, new.bottomleft[1]
+# TODO - figure out the reason for the image to not be flush with top blockers or bottom blockers
+# It looks like it is an image rendering issue
 params = params()
 
 if __name__ == '__main__':
