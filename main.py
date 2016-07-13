@@ -39,7 +39,8 @@ class params(object):
 class Player_Sprite(Image):
     def __init__(self,pos,mapz,**kwargs):
         super(Player_Sprite,self).__init__(pos=pos, size=(193,81),*kwargs)
-        self.mov_images = Atlas("animation\/animatlas\/animatlas.atlas")
+        self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
+        self.atk_images = Atlas("animation\/attack/atk.atlas")
         self.map = mapz
         self.texture = self.mov_images['walk_1_right']
         self.moving_right = False
@@ -50,11 +51,21 @@ class Player_Sprite(Image):
         self.jumping = False
         print self.texture_size
 
+    def atk(self,dt):
+        if not self.moving_right:
+            self.texture = self.atk_images['attack2_l']
+            #self.texture = self.atk_images['attack3_l']
+        if not self.moving_left:
+             self.texture = self.atk_images['attack2_r']
+             #self.texture = self.atk_images['attack2_r']
 
     def update(self, *ignore):
         dx, self.dy = 0, 0
         # last = Rect(*(self.pos + self.size))
         last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
+        if keys.get(Keyboard.keycodes['x']):
+            Clock.schedule_once(self.atk)
+
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
             if self.moving_right:
                 self.texture = self.mov_images['walk_2_right']
@@ -107,10 +118,10 @@ class Player_Sprite(Image):
         elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
             if self.moving_left and self.resting:
                 self.texture = self.mov_images['walk_1_left']
-                self.moving_left = False
+                self.moving_right = False
             elif self.moving_right and self.resting:
                 self.texture = self.mov_images['walk_1_right']
-                self.moving_right = False
+                self.moving_left = False
         if self.moving_left:
             if self.jumping:
                 self.texture = self.mov_images['jump_l']
