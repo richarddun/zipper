@@ -50,13 +50,18 @@ class Player_Sprite(Image):
         self.suspended = 0
         self.jumping = False
         self.prevdir = 'right'
+        self.atkcounter = 0
 
     def atk(self,dt):
         if self.prevdir == 'left':
-            self.texture = self.atk_images['attack2_l']
+            if self.atkcounter < 10:
+                self.texture = self.atk_images['attack2_l']
+                self.atkcounter += 1
             #self.texture = self.atk_images['attack3_l']
         elif self.prevdir == 'right':
-             self.texture = self.atk_images['attack2_r']
+            if self.atkcounter < 10:
+                self.texture = self.atk_images['attack2_r']
+                self.atkcounter += 1
              #self.texture = self.atk_images['attack2_r']
 
     def update(self, *ignore):
@@ -69,6 +74,8 @@ class Player_Sprite(Image):
         last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
         if keys.get(Keyboard.keycodes['x']):
             Clock.schedule_once(self.atk)
+        if not keys.get(Keyboard.keycodes['x']):
+            self.atkcounter = 0
 
         if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
             if self.moving_right:
