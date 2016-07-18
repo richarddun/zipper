@@ -49,19 +49,23 @@ class Player_Sprite(Image):
         self.movyval = 0
         self.suspended = 0
         self.jumping = False
-        print self.texture_size
+        self.prevdir = 'right'
 
     def atk(self,dt):
-        if not self.moving_right:
+        if self.prevdir == 'left':
             self.texture = self.atk_images['attack2_l']
             #self.texture = self.atk_images['attack3_l']
-        if not self.moving_left:
+        elif self.prevdir == 'right':
              self.texture = self.atk_images['attack2_r']
              #self.texture = self.atk_images['attack2_r']
 
     def update(self, *ignore):
         dx, self.dy = 0, 0
         # last = Rect(*(self.pos + self.size))
+        if keys.get(Keyboard.keycodes['right']):
+            self.prevdir = 'right'
+        if keys.get(Keyboard.keycodes['left']):
+            self.prevdir = 'left'
         last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
         if keys.get(Keyboard.keycodes['x']):
             Clock.schedule_once(self.atk)
@@ -118,10 +122,15 @@ class Player_Sprite(Image):
         elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
             if self.moving_left and self.resting:
                 self.texture = self.mov_images['walk_1_left']
-                self.moving_right = False
+                self.moving_left = False
             elif self.moving_right and self.resting:
                 self.texture = self.mov_images['walk_1_right']
-                self.moving_left = False
+                self.moving_right = False
+            else:
+                if self.prevdir == 'left':
+                   self.texture = self.mov_images['walk_1_left']
+                elif self.prevdir == 'right':
+                    self.texture = self.mov_images['walk_1_right']
         if self.moving_left:
             if self.jumping:
                 self.texture = self.mov_images['jump_l']
