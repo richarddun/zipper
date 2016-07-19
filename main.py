@@ -4,9 +4,11 @@ from kivy.uix.image import Image
 from kivy.atlas import Atlas
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
+from kivy.vector import Vector
 import tmx
 from rect import Rect
 from collections import defaultdict
+from math import atan2, degrees, pi
 
 keys = defaultdict(lambda: False)
 
@@ -41,6 +43,7 @@ class Player_Sprite(Image):
         super(Player_Sprite,self).__init__(pos=pos, size=(193,81),*kwargs)
         self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
         self.atk_images = Atlas("animation\/attack/atk.atlas")
+        self.spe_images = Atlas("animation\/special\/special.atlas.atlas")
         self.map = mapz
         self.texture = self.mov_images['walk_1_right']
         self.moving_right = False
@@ -51,6 +54,37 @@ class Player_Sprite(Image):
         self.jumping = False
         self.prevdir = 'right'
         self.atkcounter = 0
+
+    def orientation(self, touch):
+        """
+        :param touch:
+        receive Kivy touch location, find difference between touch and
+        current self.position.  Calculate angle, display an image based
+        on the angle
+        :return:
+        none
+        """
+        self.delta_x = touch.pos[0] - self.pos[0]
+        self.delta_y = touch.pos[1] - self.pos[1]
+        self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
+        if self.bearing >= 0 and self.bearing <= 30:
+            self.texture = self.spe_images['special_r_1']
+        elif self.bearing > 30 and self.bearing <= 60:
+            self.texture = self.spe_images['special_r_2']
+        elif self.bearing > 60 and self.bearing <= 90:
+            self.texture = self.spe_images['special_r_3']
+        elif self.bearing > 90 and self.bearing <= 120:
+            self.texture = self.spe_images['special_l_3']
+        elif self.bearing > 120 and self.bearing <= 150:
+            self.texture = self.spe_images['special_l_2']
+        elif self.bearing > 150 and self.bearing <= 180:
+            self.texture = self.spe_images['special_l_1']
+
+    def on_touch_down(self, touch):
+        self.orientation(touch)
+
+    def on_touch_move(self, touch):
+        self.orientation(touch)
 
     def atk(self,dt):
         if self.prevdir == 'left':
@@ -178,6 +212,7 @@ if __name__ == '__main__':
         keys[keycode] = True
     def on_key_up(window, keycode, *rest):
         keys[keycode] = False
+
     Window.bind(on_key_down=on_key_down, on_key_up=on_key_up)
     ZippyApp().run()
 
