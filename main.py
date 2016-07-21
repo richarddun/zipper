@@ -71,6 +71,8 @@ class Player_Sprite(Image):
         """
         self.skew_x_touch = self.map.map.viewport.bottomleft[0] + touch.pos[0]
         self.skew_y_touch = self.map.map.viewport.bottomleft[1] + touch.pos[1]
+        # Above skew_x and skew_y track the x/y touch positions, plus the position of the current viewport
+        # to aid in finding the 'true' touch value as expressed with reference to the full map.
         self.delta_x = self.skew_x_touch - self.last.center[0]
         self.delta_y = self.skew_y_touch - self.last.center[1]
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
@@ -81,13 +83,6 @@ class Player_Sprite(Image):
     def on_touch_down(self, touch):
         self.touching = True
         print 'touch position is ' + 'x : ' + str(touch.pos[0]) + ' , y : ' + str(touch.pos[1])
-        #print 'last rect center position is ' +'x : ' + str(self.new.center[0]) + ' , y : ' + str(self.new.center[1])
-        #print 'map focus points (x/y) : ' + str(self.map.map.fx) +' ' + str(self.map.map.fy)
-        #print 'center focus points (x/y) : ' + str(self.map.map.restricted_fx) + ' ' + str(self.map.map.restricted_fy)
-        #print 'viewport bottomleft is (x/y) ' + str(self.map.map.viewport.bottomleft[0]) + ' ' + str(self.map.map.viewport.bottomleft[1])
-
-        # Above skew_x and skew_y track the x/y touch positions, plus the position of the current viewport
-        # to aid in finding the 'true' touch value as expressed with reference to the full map.
         self.orientation(touch)
 
     def on_touch_move(self, touch):
