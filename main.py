@@ -54,6 +54,11 @@ class Player_Sprite(Image):
         self.jumping = False
         self.prevdir = 'right'
         self.atkcounter = 0
+        self.touching = False
+        self.perma_x = self.map.map.view_w / 2
+        self.perma_y = self.map.map.view_y / 2
+        self.skew_x_touch, self.skew_y_touch = 0,0
+
 
     def orientation(self, touch):
         """
@@ -64,27 +69,33 @@ class Player_Sprite(Image):
         :return:
         none
         """
-        self.delta_x = touch.pos[0] - self.pos[0]
-        self.delta_y = touch.pos[1] - self.pos[1]
+        self.skew_x_touch = self.map.map.viewport.bottomleft[0] + touch.pos[0]
+        self.skew_y_touch = self.map.map.viewport.bottomleft[1] + touch.pos[1]
+        self.delta_x = self.skew_x_touch - self.last.center[0]
+        self.delta_y = self.skew_y_touch - self.last.center[1]
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
-        if self.bearing >= 0 and self.bearing <= 30:
-            self.texture = self.spe_images['special_r_1']
-        elif self.bearing > 30 and self.bearing <= 60:
-            self.texture = self.spe_images['special_r_2']
-        elif self.bearing > 60 and self.bearing <= 90:
-            self.texture = self.spe_images['special_r_3']
-        elif self.bearing > 90 and self.bearing <= 120:
-            self.texture = self.spe_images['special_l_3']
-        elif self.bearing > 120 and self.bearing <= 150:
-            self.texture = self.spe_images['special_l_2']
-        elif self.bearing > 150 and self.bearing <= 180:
-            self.texture = self.spe_images['special_l_1']
+        print 'bearing is ' + str(self.bearing)
+        print 'x delta is ' + str(self.delta_x) + ', y delta is ' + str(self.delta_y)
+
 
     def on_touch_down(self, touch):
+        self.touching = True
+        print 'touch position is ' + 'x : ' + str(touch.pos[0]) + ' , y : ' + str(touch.pos[1])
+        #print 'last rect center position is ' +'x : ' + str(self.new.center[0]) + ' , y : ' + str(self.new.center[1])
+        #print 'map focus points (x/y) : ' + str(self.map.map.fx) +' ' + str(self.map.map.fy)
+        #print 'center focus points (x/y) : ' + str(self.map.map.restricted_fx) + ' ' + str(self.map.map.restricted_fy)
+        #print 'viewport bottomleft is (x/y) ' + str(self.map.map.viewport.bottomleft[0]) + ' ' + str(self.map.map.viewport.bottomleft[1])
+
+        # Above skew_x and skew_y track the x/y touch positions, plus the position of the current viewport
+        # to aid in finding the 'true' touch value as expressed with reference to the full map.
         self.orientation(touch)
 
     def on_touch_move(self, touch):
+        self.touching = True
         self.orientation(touch)
+
+    def on_touch_up(self, touch):
+        self.touching = False
 
     def atk(self,dt):
         if self.prevdir == 'left':
@@ -100,110 +111,123 @@ class Player_Sprite(Image):
 
     def update(self, *ignore):
         dx, self.dy = 0, 0
-        # last = Rect(*(self.pos + self.size))
-        if keys.get(Keyboard.keycodes['right']):
-            self.prevdir = 'right'
-        if keys.get(Keyboard.keycodes['left']):
-            self.prevdir = 'left'
-        last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
-        if keys.get(Keyboard.keycodes['x']):
-            Clock.schedule_once(self.atk)
-        if not keys.get(Keyboard.keycodes['x']):
-            self.atkcounter = 0
+        if self.touching:
+            if self.bearing >= 0 and self.bearing <= 30:
+                self.texture = self.spe_images['special_r_1']
+            elif self.bearing > 30 and self.bearing <= 60:
+                self.texture = self.spe_images['special_r_2']
+            elif self.bearing > 60 and self.bearing <= 90:
+                self.texture = self.spe_images['special_r_3']
+            elif self.bearing > 90 and self.bearing <= 120:
+                self.texture = self.spe_images['special_l_3']
+            elif self.bearing > 120 and self.bearing <= 150:
+                self.texture = self.spe_images['special_l_2']
+            elif self.bearing > 150 and self.bearing <= 180:
+                self.texture = self.spe_images['special_l_1']       # last = Rect(*(self.pos + self.size))
+        else:
+            if keys.get(Keyboard.keycodes['right']):
+                self.prevdir = 'right'
+            if keys.get(Keyboard.keycodes['left']):
+                self.prevdir = 'left'
+            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
+            if keys.get(Keyboard.keycodes['x']):
+                Clock.schedule_once(self.atk)
+            if not keys.get(Keyboard.keycodes['x']):
+                self.atkcounter = 0
 
-        if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
-            if self.moving_right:
-                self.texture = self.mov_images['walk_2_right']
-            elif self.moving_left:
-                self.texture = self.mov_images['walk_2_left']
-            self.jumping = True
-            self.resting = False
-            self.dy = 5 * params.scale
-        elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
-            if self.movyval > 20:
-                self.jumping = False
-                self.movyval = 0
+            if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
                 if self.moving_right:
                     self.texture = self.mov_images['walk_2_right']
                 elif self.moving_left:
                     self.texture = self.mov_images['walk_2_left']
-                self.dy -= 6 * params.scale
-            else:
-                if self.moving_right:
-                    self.texture = self.mov_images['jump_r']
-                elif self.moving_left:
-                    self.texture = self.mov_images['jump_l']
+                self.jumping = True
+                self.resting = False
                 self.dy = 5 * params.scale
-                self.movyval += .5
-        if self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
-            self.jumping = False
-            self.movyval = 0
-        if not self.jumping:
-            if self.moving_right:
-                self.texture = self.mov_images['walk_2_right']
-                self.dy -= 6 * params.scale
-            elif self.moving_left:
-                self.texture = self.mov_images['walk_2_left']
-                self.dy -= 6 * params.scale
-            else:
-                self.dy -= 6 * params.scale
-        if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
-                keys.get(Keyboard.keycodes['right']):
-            dx -= 5 * params.scale
-            self.moving_left = True
-            self.moving_right = False
-        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
-                keys.get(Keyboard.keycodes['left']):
-            dx += 5 * params.scale
-            self.moving_right = True
-            self.moving_left = False
-        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
-                keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']):
-            self.moving_left, self.moving_right = False,False
-        elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
-            if self.moving_left and self.resting:
-                self.texture = self.mov_images['walk_1_left']
-                self.moving_left = False
-            elif self.moving_right and self.resting:
-                self.texture = self.mov_images['walk_1_right']
+            elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
+                if self.movyval > 20:
+                    self.jumping = False
+                    self.movyval = 0
+                    if self.moving_right:
+                        self.texture = self.mov_images['walk_2_right']
+                    elif self.moving_left:
+                        self.texture = self.mov_images['walk_2_left']
+                    self.dy -= 6 * params.scale
+                else:
+                    if self.moving_right:
+                        self.texture = self.mov_images['jump_r']
+                    elif self.moving_left:
+                        self.texture = self.mov_images['jump_l']
+                    self.dy = 5 * params.scale
+                    self.movyval += .5
+            if self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
+                self.jumping = False
+                self.movyval = 0
+            if not self.jumping:
+                if self.moving_right:
+                    self.texture = self.mov_images['walk_2_right']
+                    self.dy -= 6 * params.scale
+                elif self.moving_left:
+                    self.texture = self.mov_images['walk_2_left']
+                    self.dy -= 6 * params.scale
+                else:
+                    self.dy -= 6 * params.scale
+            if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
+                    keys.get(Keyboard.keycodes['right']):
+                dx -= 5 * params.scale
+                self.moving_left = True
                 self.moving_right = False
-            else:
-                if self.prevdir == 'left':
-                   self.texture = self.mov_images['walk_1_left']
-                elif self.prevdir == 'right':
+            elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
+                    keys.get(Keyboard.keycodes['left']):
+                dx += 5 * params.scale
+                self.moving_right = True
+                self.moving_left = False
+            elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
+                    keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']):
+                self.moving_left, self.moving_right = False,False
+            elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+                if self.moving_left and self.resting:
+                    self.texture = self.mov_images['walk_1_left']
+                    self.moving_left = False
+                elif self.moving_right and self.resting:
                     self.texture = self.mov_images['walk_1_right']
-        if self.moving_left:
-            if self.jumping:
-                self.texture = self.mov_images['jump_l']
-            else:
-                self.texture = self.mov_images['walk_2_left']
-        if self.moving_right:
-            if self.jumping:
-                self.texture = self.mov_images['jump_r']
-            else:
-                self.texture = self.mov_images['walk_2_right']
-        self.x += dx
-        self.y += self.dy
-        # new = Rect(*(self.pos + self.size))
-        new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
-        """Rect instantiated with x set to where character drawing is, relative to the
-         overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
-         collision as the character drawing is centered within a larger transparent image"""
-        for cell in self.map.map.layers['blocker'].collide(new, 'blocker'):
-            blocker = cell['blocker']
-            if 't' in blocker and last.bottom >= cell.top and new.bottom < cell.top:
-                self.resting = True
-                new.bottom = cell.top
-                self.dy = 0
-            if 'b' in blocker and last.top <= cell.bottom and new.top > cell.bottom:
-                new.top = cell.bottom
-                self.dy = 0
-                self.suspended = 0
-            if 'l' in blocker and last.right <= cell.left and new.right > cell.left:
-                new.right = cell.left-1  # 1 pixel for padding, to prevent corner sticking
-            if 'r' in blocker and last.left >= cell.right and new.left < cell.right:
-                new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
-        self.pos = new.bottomleft[0]-self.width*.42, new.bottomleft[1]
+                    self.moving_right = False
+                else:
+                    if self.prevdir == 'left':
+                       self.texture = self.mov_images['walk_1_left']
+                    elif self.prevdir == 'right':
+                        self.texture = self.mov_images['walk_1_right']
+            if self.moving_left:
+                if self.jumping:
+                    self.texture = self.mov_images['jump_l']
+                else:
+                    self.texture = self.mov_images['walk_2_left']
+            if self.moving_right:
+                if self.jumping:
+                    self.texture = self.mov_images['jump_r']
+                else:
+                    self.texture = self.mov_images['walk_2_right']
+            self.x += dx
+            self.y += self.dy
+            # new = Rect(*(self.pos + self.size))
+            self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
+            """Rect instantiated with x set to where character drawing is, relative to the
+             overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
+             collision as the character drawing is centered within a larger transparent image"""
+            for cell in self.map.map.layers['blocker'].collide(self.new, 'blocker'):
+                blocker = cell['blocker']
+                if 't' in blocker and self.last.bottom >= cell.top and self.new.bottom < cell.top:
+                    self.resting = True
+                    self.new.bottom = cell.top
+                    self.dy = 0
+                if 'b' in blocker and self.last.top <= cell.bottom and self.new.top > cell.bottom:
+                    self.new.top = cell.bottom
+                    self.dy = 0
+                    self.suspended = 0
+                if 'l' in blocker and self.last.right <= cell.left and self.new.right > cell.left:
+                    self.new.right = cell.left-1  # 1 pixel for padding, to prevent corner sticking
+                if 'r' in blocker and self.last.left >= cell.right and self.new.left < cell.right:
+                    self.new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
+            self.pos = self.new.bottomleft[0]-self.width*.42, self.new.bottomleft[1]
 
 params = params()
 
