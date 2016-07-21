@@ -76,13 +76,10 @@ class Player_Sprite(Image):
         self.delta_x = self.skew_x_touch - self.last.center[0]
         self.delta_y = self.skew_y_touch - self.last.center[1]
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
-        print 'bearing is ' + str(self.bearing)
-        print 'x delta is ' + str(self.delta_x) + ', y delta is ' + str(self.delta_y)
 
 
     def on_touch_down(self, touch):
         self.touching = True
-        print 'touch position is ' + 'x : ' + str(touch.pos[0]) + ' , y : ' + str(touch.pos[1])
         self.orientation(touch)
 
     def on_touch_move(self, touch):
