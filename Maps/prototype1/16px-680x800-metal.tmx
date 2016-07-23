@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="39">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="42">
  <tileset firstgid="1" name="tiles1" tilewidth="16" tileheight="16" tilecount="84" columns="14">
   <image source="../../Tiles/metal/tiles1.png" width="224" height="96"/>
  </tileset>
@@ -70,7 +70,7 @@
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="33" name="platform" x="898.492" y="289.528" width="60.2462" height="13.8696" visible="0">
+  <object id="33" name="platform" x="512" y="368" width="60.2462" height="13.8696" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
@@ -81,6 +81,16 @@
    </properties>
   </object>
   <object id="36" name="platform" x="704.317" y="288.662" width="61.9799" height="13.8696" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="40" name="wall" x="1264" y="16" width="38" height="1258.55" rotation="90" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="41" name="platform" x="896" y="288" width="61.9799" height="13.8696" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>

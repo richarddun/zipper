@@ -58,7 +58,8 @@ class Player_Sprite(Image):
         self.perma_x = self.map.map.view_w / 2
         self.perma_y = self.map.map.view_y / 2
         self.skew_x_touch, self.skew_y_touch = 0,0
-
+        self.zipping = False
+        self.sticking = False
 
     def orientation(self, touch):
         """
@@ -71,20 +72,26 @@ class Player_Sprite(Image):
         """
         self.skew_x_touch = self.map.map.viewport.bottomleft[0] + touch.pos[0]
         self.skew_y_touch = self.map.map.viewport.bottomleft[1] + touch.pos[1]
+        self.touch_skew = (self.skew_x_touch,self.skew_y_touch)
         # Above skew_x and skew_y track the x/y touch positions, plus the position of the current viewport
         # to aid in finding the 'true' touch value as expressed with reference to the full map.
-        self.delta_x = self.skew_x_touch - self.last.center[0]
-        self.delta_y = self.skew_y_touch - self.last.center[1]
+        self.delta_x = self.skew_x_touch - self.new.center[0]
+        self.delta_y = self.skew_y_touch - self.new.center[1]
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
-
 
     def on_touch_down(self, touch):
         self.touching = True
-        self.orientation(touch)
+        if not self.zipping:
+            self.orientation(touch)
+            self.origin = Vector(*self.new.center)
+            self.target = Vector(*self.touch_skew)
+            self.tgetdir = self.target - self.origin
+            self.movedir = self.tgetdir.normalize()
 
     def on_touch_move(self, touch):
-        self.touching = True
-        self.orientation(touch)
+        if not self.zipping:
+            self.touching = True
+            self.orientation(touch)
 
     def on_touch_up(self, touch):
         self.touching = False
@@ -101,9 +108,18 @@ class Player_Sprite(Image):
                 self.atkcounter += 1
              #self.texture = self.atk_images['attack2_r']
 
+    def zip(self):
+        self.x += self.movedir.x * (8*params.scale)
+        self.y += self.movedir.y * (8*params.scale)
+
+        if self.move_or_collide():
+            self.zipping = False
+        else:
+            self.zipping = True
+        print str(self.zipping)
+
     def update(self, *ignore):
-        dx, self.dy = 0, 0
-        if self.touching:
+        if (self.touching or self.sticking) or (self.zipping):
             if self.bearing >= 0 and self.bearing <= 30:
                 self.texture = self.spe_images['special_r_1']
             elif self.bearing > 30 and self.bearing <= 60:
@@ -116,7 +132,15 @@ class Player_Sprite(Image):
                 self.texture = self.spe_images['special_l_2']
             elif self.bearing > 150 and self.bearing <= 180:
                 self.texture = self.spe_images['special_l_1']       # last = Rect(*(self.pos + self.size))
+            if (keys.get(Keyboard.keycodes['z']) or self.zipping):
+                self.resting = True
+                self.zip()
+
+            if keys.get(Keyboard.keycodes['c']):
+                self.resting = False
+
         else:
+            self.dx, self.dy = 0, 0
             if keys.get(Keyboard.keycodes['right']):
                 self.prevdir = 'right'
             if keys.get(Keyboard.keycodes['left']):
@@ -165,12 +189,12 @@ class Player_Sprite(Image):
                     self.dy -= 6 * params.scale
             if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
                     keys.get(Keyboard.keycodes['right']):
-                dx -= 5 * params.scale
+                self.dx -= 5 * params.scale
                 self.moving_left = True
                 self.moving_right = False
             elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
                     keys.get(Keyboard.keycodes['left']):
-                dx += 5 * params.scale
+                self.dx += 5 * params.scale
                 self.moving_right = True
                 self.moving_left = False
             elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
@@ -198,28 +222,41 @@ class Player_Sprite(Image):
                     self.texture = self.mov_images['jump_r']
                 else:
                     self.texture = self.mov_images['walk_2_right']
-            self.x += dx
-            self.y += self.dy
-            # new = Rect(*(self.pos + self.size))
-            self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
-            """Rect instantiated with x set to where character drawing is, relative to the
-             overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
-             collision as the character drawing is centered within a larger transparent image"""
-            for cell in self.map.map.layers['blocker'].collide(self.new, 'blocker'):
-                blocker = cell['blocker']
-                if 't' in blocker and self.last.bottom >= cell.top and self.new.bottom < cell.top:
-                    self.resting = True
-                    self.new.bottom = cell.top
-                    self.dy = 0
-                if 'b' in blocker and self.last.top <= cell.bottom and self.new.top > cell.bottom:
-                    self.new.top = cell.bottom
-                    self.dy = 0
-                    self.suspended = 0
-                if 'l' in blocker and self.last.right <= cell.left and self.new.right > cell.left:
-                    self.new.right = cell.left-1  # 1 pixel for padding, to prevent corner sticking
-                if 'r' in blocker and self.last.left >= cell.right and self.new.left < cell.right:
-                    self.new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
+            if not self.zipping:
+                self.x += self.dx
+                self.y += self.dy
+                self.move_or_collide()
+
+    def move_or_collide(self):
+        blocked = False
+        self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
+        """Rect instantiated with x set to where character drawing is, relative to the
+         overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
+         collision as the character drawing is centered within a larger transparent image"""
+        for cell in self.map.map.layers['blocker'].collide(self.new, 'blocker'):
+            blocker = cell['blocker']
+            if 't' in blocker and self.last.bottom >= cell.top and self.new.bottom < cell.top:
+                self.resting = True
+                self.new.bottom = cell.top
+                self.dy = 0
+                blocked = True
+            if 'b' in blocker and self.last.top <= cell.bottom and self.new.top > cell.bottom:
+                self.new.top = cell.bottom
+                self.dy = 0
+                blocked = True
+                self.suspended = 0
+            if 'l' in blocker and self.last.right <= cell.left and self.new.right > cell.left:
+                self.new.right = cell.left-1  # 1 pixel for padding, to prevent corner sticking
+                blocked = True
+            if 'r' in blocker and self.last.left >= cell.right and self.new.left < cell.right:
+                self.new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
+                blocked = True
             self.pos = self.new.bottomleft[0]-self.width*.42, self.new.bottomleft[1]
+            self.posref = self.pos
+        if blocked == True:
+            return True
+        else:
+            return False
 
 params = params()
 
