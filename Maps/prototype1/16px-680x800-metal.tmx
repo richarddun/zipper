@@ -85,7 +85,7 @@
     <property name="blocker" value="tblr"/>
    </properties>
   </object>
-  <object id="40" name="wall" x="1264" y="16" width="38" height="1258.55" rotation="90" visible="0">
+  <object id="40" name="wall" x="2" y="0" width="1262" height="32" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>

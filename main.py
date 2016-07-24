@@ -72,14 +72,14 @@ class Player_Sprite(Image):
         """
         self.skew_x_touch = self.map.map.viewport.bottomleft[0] + touch.pos[0]
         self.skew_y_touch = self.map.map.viewport.bottomleft[1] + touch.pos[1]
-        self.touch_skew = (self.skew_x_touch,self.skew_y_touch)
+        self.touch_skew = (self.skew_x_touch, self.skew_y_touch)
         # Above skew_x and skew_y track the x/y touch positions, plus the position of the current viewport
         # to aid in finding the 'true' touch value as expressed with reference to the full map.
         self.delta_x = self.skew_x_touch - self.new.center[0]
         self.delta_y = self.skew_y_touch - self.new.center[1]
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
 
-    def on_touch_down(self, touch):
+    def prep_zip(self, touch):
         self.touching = True
         if not self.zipping:
             self.orientation(touch)
@@ -88,10 +88,11 @@ class Player_Sprite(Image):
             self.tgetdir = self.target - self.origin
             self.movedir = self.tgetdir.normalize()
 
+    def on_touch_down(self, touch):
+        self.prep_zip(touch)
+
     def on_touch_move(self, touch):
-        if not self.zipping:
-            self.touching = True
-            self.orientation(touch)
+        self.prep_zip(touch)
 
     def on_touch_up(self, touch):
         self.touching = False
@@ -109,8 +110,8 @@ class Player_Sprite(Image):
              #self.texture = self.atk_images['attack2_r']
 
     def zip(self):
-        self.x += self.movedir.x * (8*params.scale)
-        self.y += self.movedir.y * (8*params.scale)
+        self.x += self.movedir.x * (40*params.scale)
+        self.y += self.movedir.y * (40*params.scale)
 
         if self.move_or_collide():
             self.zipping = False
