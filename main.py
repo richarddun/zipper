@@ -97,6 +97,7 @@ class Player_Sprite(Image):
 
     def on_touch_up(self, touch):
         self.touching = False
+        self.coldir = 'n'
 
     def atk(self,dt):
         if self.prevdir == 'left':
@@ -121,7 +122,7 @@ class Player_Sprite(Image):
 
     def update(self, *ignore):
         if (self.touching or self.sticking) or (self.zipping):
-            if self.coldir == 't':
+            if self.coldir == 't' or self.coldir == 'n':
                 if self.bearing >= 0 and self.bearing <= 30:
                     self.texture = self.spe_images['special_r_1']
                 elif self.bearing > 30 and self.bearing <= 60:
