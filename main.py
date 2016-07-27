@@ -40,7 +40,8 @@ class params(object):
 
 class Player_Sprite(Image):
     def __init__(self,pos,mapz,**kwargs):
-        super(Player_Sprite,self).__init__(pos=pos, size=(193,81),*kwargs)
+        super(Player_Sprite,self).__init__(pos=pos,size=(195,164),*kwargs)
+        #  (pos=pos, size=(192,81),*kwargs)
         self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
         self.atk_images = Atlas("animation\/attack/atk.atlas")
         self.spe_images = Atlas("animation\/special\/specatlas.atlas")
@@ -67,7 +68,7 @@ class Player_Sprite(Image):
         """
         :param touch:
         receive Kivy touch location, find difference between touch and
-        current self.position.  Calculate angle, display an image based
+        current self.position.  Calculate angle, to later display an image based
         on the angle
         :return:
         none
@@ -275,7 +276,7 @@ class Player_Sprite(Image):
 
     def move_or_collide(self):
         blocked = False
-        self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1])
+        self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1]*.70)
         """Rect instantiated with x set to where character drawing is, relative to the
          overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
          collision as the character drawing is centered within a larger transparent image"""
