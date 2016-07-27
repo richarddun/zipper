@@ -44,6 +44,7 @@ class Player_Sprite(Image):
         self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
         self.atk_images = Atlas("animation\/attack/atk.atlas")
         self.spe_images = Atlas("animation\/special\/specatlas.atlas")
+        self.wall_images = Atlas("animation\/special\/wall_anim\/wall.atlas")
         self.map = mapz
         self.texture = self.mov_images['walk_1_right']
         self.moving_right = False
@@ -88,6 +89,7 @@ class Player_Sprite(Image):
             self.target = Vector(*self.touch_skew)
             self.tgetdir = self.target - self.origin
             self.movedir = self.tgetdir.normalize()
+            print str(self.bearing)
 
     def on_touch_down(self, touch):
         self.prep_zip(touch)
@@ -148,6 +150,34 @@ class Player_Sprite(Image):
                     self.texture = self.spe_images['special_l_2_u']
                 elif self.bearing < -150 and self.bearing >= -180:
                     self.texture = self.spe_images['special_l_1_u']
+            elif self.coldir == 'r':
+                if self.bearing <= 90 and self.bearing > 60:
+                    self.texture = self.wall_images['special_lside_1']
+                elif self.bearing <= 60 and self.bearing > 30:
+                    self.texture = self.wall_images['special_lside_2']
+                elif self.bearing <= 30 and self.bearing >0:
+                    self.texture = self.wall_images['special_lside_3']
+                elif self.bearing <= 0 and self.bearing > -30:
+                    self.texture = self.wall_images['special_lside_4']
+                elif self.bearing <= -30 and self.bearing > -60:
+                    self.texture = self.wall_images['special_lside_5']
+                elif self.bearing <= -60 and self.bearing > -90:
+                    self.texture = self.wall_images['special_lside_5']  # need to add one more sprite for straight down
+            elif self.coldir == 'l':
+                if self.bearing >= 90 and self.bearing < 120:
+                    self.texture = self.wall_images['special_rside_1']
+                elif self.bearing >= 120 and self.bearing < 150 :
+                    self.texture = self.wall_images['special_rside_2']
+                elif self.bearing >= 150 and self.bearing < 180:
+                    self.texture = self.wall_images['special_rside_3']
+                elif self.bearing > -180 and self.bearing < -150:
+                    self.texture = self.wall_images['special_rside_4']
+                elif self.bearing >= -150 and self.bearing < -120:
+                    self.texture = self.wall_images['special_rside_5']
+                elif self.bearing >= -120 and self.bearing < -90:
+                    self.texture = self.wall_images['special_rside_5']
+
+
             if (keys.get(Keyboard.keycodes['z']) or self.zipping):
                 self.resting = True
                 self.zip()
