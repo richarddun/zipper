@@ -192,7 +192,7 @@ class Player_Sprite(Image):
                 self.prevdir = 'right'
             if keys.get(Keyboard.keycodes['left']):
                 self.prevdir = 'left'
-            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1])
+            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1], (self.size[0]/6), self.size[1]*.30)
             if keys.get(Keyboard.keycodes['x']):
                 Clock.schedule_once(self.atk)
             if not keys.get(Keyboard.keycodes['x']):
@@ -276,7 +276,7 @@ class Player_Sprite(Image):
 
     def move_or_collide(self):
         blocked = False
-        self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1]*.70)
+        self.new = Rect(self.pos[0]+(self.width*.42), self.pos[1], (self.size[0]/6), self.size[1]*.30)
         """Rect instantiated with x set to where character drawing is, relative to the
          overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
          collision as the character drawing is centered within a larger transparent image"""
