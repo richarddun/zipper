@@ -34,6 +34,9 @@ class ZippyGame(Widget):
         self.map.set_focus(*self.sprite.pos)
 
 class params(object):
+    """
+    Initialise some useful parameters for scaling
+    """
     def __init__(self):
         self.width, self.height = Window.size
         self.scale = self.height / 256.      # 21 tile size * 12
@@ -83,6 +86,12 @@ class Player_Sprite(Image):
         self.bearing = atan2(self.delta_y, self.delta_x) * 180 / pi
 
     def prep_zip(self, touch):
+        """
+        helper method to pre-compute the vector and angle based on mouse pointer relation to sprite
+        when mouse is clicked and held (and moved)
+        :param touch: takes kivy touch as input
+        :return: none
+        """
         self.touching = True
         if not self.zipping:
             self.orientation(touch)
@@ -90,31 +99,54 @@ class Player_Sprite(Image):
             self.target = Vector(*self.touch_skew)
             self.tgetdir = self.target - self.origin
             self.movedir = self.tgetdir.normalize()
-            print str(self.bearing)
+            #print str(self.bearing)
 
     def on_touch_down(self, touch):
+        """
+        kivy on_touch_down handle, to fire prep_zip when mouse button is pressed
+        :param touch: kivy touch input
+        :return: none
+        """
         self.prep_zip(touch)
 
     def on_touch_move(self, touch):
+        """
+        kivy on_touch_move handle, to fire prep_zip when mouse button is pressed and mouse is moved
+        :param touch: kivy touch input
+        :return: none
+        """
         self.prep_zip(touch)
 
     def on_touch_up(self, touch):
+        """
+        kivy on_touch_up handle, to clear prep_zip values and cease action when mouse is released
+        :param touch: kivy touch input
+        :return: none
+        """
         self.touching = False
         self.coldir = 'n'
 
     def atk(self,dt):
+        """
+        method to trigger animation for attack with main weapon
+        :param dt: delta-time (unused at present)
+        :return: none
+        """
         if self.prevdir == 'left':
-            if self.atkcounter < 10:
+            if self.atkcounter < 10:  # counter used to prevent animation sticking
                 self.texture = self.atk_images['attack2_l']
                 self.atkcounter += 1
-            #self.texture = self.atk_images['attack3_l']
         elif self.prevdir == 'right':
             if self.atkcounter < 10:
                 self.texture = self.atk_images['attack2_r']
                 self.atkcounter += 1
-             #self.texture = self.atk_images['attack2_r']
 
     def zip(self):
+        """
+        method to move sprite image along movedir, previously computed by prep_zip.
+        also checks for collision with objects
+        :return: none
+        """
         self.x += self.movedir.x * (40*params.scale)
         self.y += self.movedir.y * (40*params.scale)
         self.coldir = 'n'
@@ -124,6 +156,11 @@ class Player_Sprite(Image):
             self.zipping = True
 
     def update(self, *ignore):
+        """
+        main update method, handles character movement logic and animation updates
+        :param ignore: unused, reserved for future use
+        :return: none
+        """
         if (self.touching or self.sticking) or (self.zipping):
             if self.coldir == 't' or self.coldir == 'n':
                 if self.bearing >= 0 and self.bearing <= 30:
@@ -275,6 +312,10 @@ class Player_Sprite(Image):
                 self.move_or_collide()
 
     def move_or_collide(self):
+        """
+        creates Rect around sprite image at center of transparent image.  Checks for collision, acts appropriately.
+        :return: True if collision has occurred, False if not
+        """
         blocked = False
         self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16), self.size[1]*.29)
         """Rect instantiated with x set to where character drawing is, relative to the
