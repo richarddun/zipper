@@ -14,10 +14,10 @@ To test it out :
 
 Controls : 
 
-a,d = move left,right
-spacebar = jump
-x = attack with sword
-left mouse click (and hold) - aim character
-while mouse button held, press 'z' - move until collision with object
-character will stay attached until mouse button is removed.
+- a,d = move left,right
+- spacebar = jump
+- x = attack with sword
+- left mouse click (and hold) - aim character
+- while mouse button held, press 'z' - move until collision with object
+- character will stay attached until mouse button is removed.
 
