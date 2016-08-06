@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="42">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="44">
  <tileset firstgid="1" name="tiles1" tilewidth="16" tileheight="16" tilecount="84" columns="14">
   <image source="../../Tiles/metal/tiles1.png" width="224" height="96"/>
  </tileset>
@@ -13,7 +13,7 @@
  </tileset>
  <layer name="Tile Layer 1" width="79" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt200OwiAQhuHeRxeoK11Ud3Wh3v84TmNJCOkPWCyMvIvJBw22CfZxjKmmaZqD1FHqJmWGuXGO2zQR46nXL631zxd73S3HrdR12LeXM3eP22wjxlOvX1rrny/2uluO7XwntSeD8iH1dPbuLHUhg9KatXvXSd3JoMQsZjGrKzGLWczqSsxiFrO6ErOYxayu/Aezp8DC7Cf9fUm9HrOYLTW1mi0htzAb+lme22ApZv19Sb2+hMRs2Wb/NemzmI3JsT6F2fC+PzfH7HT6ffzbvl6r2bk5ZjGL2bISs5jFrK7ELGZrNBv6e+ZY1W52zd5hVm/mNqs5c5vVnDWZTf1sRE1mU/fpmsym7tM1mP3V80ypzNr7rnfb//czp83OeV/HrJa2d/a+W/Ndt9ayveIN9HBvaA==
+   eJzt20EOwiAQBdDeRxeoK11Ud3Wh3v84TmMnIaS0YCdlBv5i8qHBVrFPiFHXdd2J6kz1oHJT33nHOV1GO/b4tbHh+XKvu2e7p7pP8/bx+v5xzj6jHXv82tjwfLnX3bPN/QPVEZmUL6q3N3dXqhsyKdksz91A9UQmJczCLMzaSpiFWZi1lTALszBrK2EWZmHWVtZg9pJYMPvLcF6kx8MszGpNq2Y15B5mUz/LSxvUYjacF+nxGhJmdZutNbHOwmxOzq1TMJu+7i/1pc3G9hUa7ORm+Lz/fR2tml3qw6weszUlzMIszNpKmIVZqYztP2G2LrOp32fOVetmt8xdaeMwa9es5Sxt1nK2ZFb6txEtmZVep1syK71Ot2A2tsfRYpbvu9Ht+N/PkjYH732ds6pt7vi+27LXbbV4rfgCJsJvGg==
   </data>
  </layer>
  <objectgroup name="start" visible="0">
@@ -91,6 +91,16 @@
    </properties>
   </object>
   <object id="41" name="platform" x="896" y="288" width="61.9799" height="13.8696" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="42" name="platform" x="130" y="463" width="93" height="16" visible="0">
+   <properties>
+    <property name="blocker" value="bltr"/>
+   </properties>
+  </object>
+  <object id="43" name="platform" x="768.125" y="591.875" width="95.875" height="16.125">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>
