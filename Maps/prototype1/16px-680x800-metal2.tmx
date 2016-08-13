@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="95">
+ <tileset firstgid="1" name="tiles1" tilewidth="16" tileheight="16" tilecount="84" columns="14">
+  <image source="../../Tiles/metal/tiles1.png" width="224" height="96"/>
+ </tileset>
+ <tileset firstgid="85" name="collision" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="182" columns="26">
+  <image source="../../Tiles/collision/collidable.gif" width="480" height="137"/>
+  <tile id="15">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="79" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztmMFOAzEMRPdruNBDCyd6KNzoAfj/zyGVqIgiJ5lxnc1m48PISPVu3CkvjnNcluX0pyMgNG9Lsqj5FMWbXoIuQe9B3y5YN78+ovgcdPAIxUvi3VvQ2SMUU+8+g64eoZh6twUWRonOrDPrzPaNr6Sc2f/4qHdbYGGU6Mx6n/U+O1acgVm2B0ialVkL72ZlVvJiVmbZHMm7OK+mPfVZNkfyLs6raU99VpMT+3ZN8mrSMMtyUuJHwwSSg3Kd8iqtYTnPspyU+NEwgeSgXKe8SmtYzrMsJyV+NEwgOc7s+syW1rOYZ/fCLHrWZdeagVn0bMyuNQOzPebZPTPbep61YFbqdeh7WzI7Qp/NcYO8tyWzB0K5Glozm55LUw56MXsmlKuhNbO1faQns6hyNczaZ32etb2D8nlWfsbn2bZ3UGx9MzCL3kGx9Tmz/Zkt5TFM5J5Z4w6KjVbMlvIYJnLPtJxntXuRFbOlPIYJq/0i/rvmnXYvsmA2d+5kmdXMvNZ3UBpm75FltjSrMsxqZ17rOyip7hqzX0E/C8csUgeiR2ZeC2Zr9ec+v3umfX9vPUWyeif7244qS++0XIwqZj5Az0rund6z3t9pLVn9z83k2Zb0CwfYa38=
+  </data>
+ </layer>
+ <objectgroup name="start" visible="0">
+  <object id="17" name="spwn" x="80" y="320" width="23" height="15">
+   <properties>
+    <property name="spawn" type="bool" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="blocker" visible="0">
+  <object id="23" name="wall1" x="0.795482" y="1.59096" width="28.6373" height="781.163">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="25" name="wall2" x="1233" y="0" width="28.6373" height="783.549">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="40" name="wall3" x="2" y="0" width="1262" height="32">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="55" name="wall4" x="0" y="704" width="736" height="96">
+   <properties>
+    <property name="blocker" value="tr"/>
+   </properties>
+  </object>
+  <object id="56" name="wall5" x="784" y="704" width="96" height="32">
+   <properties>
+    <property name="blocker" value="tbl"/>
+   </properties>
+  </object>
+  <object id="58" name="wall6" x="880" y="624" width="128" height="112">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="59" name="wall7" x="1008" y="656" width="48" height="64">
+   <properties>
+    <property name="blocker" value="trb"/>
+   </properties>
+  </object>
+  <object id="60" name="wall8" x="1008" y="720" width="32" height="16">
+   <properties>
+    <property name="blocker" value="br"/>
+   </properties>
+  </object>
+  <object id="61" name="wall9" x="1056" y="688" width="48" height="16">
+   <properties>
+    <property name="blocker" value="tbr"/>
+   </properties>
+  </object>
+  <object id="62" name="wall1a" x="1056" y="704" width="16" height="16">
+   <properties>
+    <property name="blocker" value="br"/>
+   </properties>
+  </object>
+  <object id="63" name="wall1b" x="736" y="784" width="528" height="16">
+   <properties>
+    <property name="blocker" value="t"/>
+   </properties>
+  </object>
+  <object id="64" name="wall1c" x="1136" y="688" width="128" height="96">
+   <properties>
+    <property name="blocker" value="tl"/>
+   </properties>
+  </object>
+  <object id="65" name="wall1d" x="1072" y="752" width="64" height="16">
+   <properties>
+    <property name="blocker" value="tl"/>
+   </properties>
+  </object>
+  <object id="66" name="wall1e" x="1040" y="768" width="96" height="16">
+   <properties>
+    <property name="blocker" value="tl"/>
+   </properties>
+  </object>
+  <object id="67" name="wall1f" x="880" y="224" width="80" height="80">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="68" name="wall1g" x="896" y="304" width="48" height="80">
+   <properties>
+    <property name="blocker" value="lr"/>
+   </properties>
+  </object>
+  <object id="69" name="wall1h" x="880" y="384" width="80" height="160">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="71" name="wall1i" x="896" y="544" width="48" height="80">
+   <properties>
+    <property name="blocker" value="lr"/>
+   </properties>
+  </object>
+  <object id="72" name="platform1" x="1040" y="128" width="192" height="32">
+   <properties>
+    <property name="blocker" value="tbl"/>
+   </properties>
+  </object>
+  <object id="77" name="platform2" x="1040.02" y="320.016" width="192" height="32">
+   <properties>
+    <property name="blocker" value="tbl"/>
+   </properties>
+  </object>
+  <object id="78" name="platform3" x="1040.06" y="512" width="192" height="32">
+   <properties>
+    <property name="blocker" value="tbl"/>
+   </properties>
+  </object>
+  <object id="79" name="platform4" x="960" y="224" width="192" height="32">
+   <properties>
+    <property name="blocker" value="tbr"/>
+   </properties>
+  </object>
+  <object id="80" name="platform5" x="960.031" y="416" width="192" height="32">
+   <properties>
+    <property name="blocker" value="tbr"/>
+   </properties>
+  </object>
+  <object id="82" name="triplatform" x="352" y="496">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+   <polyline points="0,0 16,0 16,-16 32,-16 32,-32 48,-32 48,-48 80,-48 80,-32 96,-32 96,-16 112,-16 112,0 128,0 128,16 0,16 0,0"/>
+  </object>
+  <object id="85" name="triwall1" x="208" y="704">
+   <properties>
+    <property name="blocker" value="tlr"/>
+   </properties>
+   <polyline points="0,0 0,-16 16,-16 16,-32 32,-32 32,-48 96,-48 96,-32 112,-32 112,-16 128,-16 128,0 0,0"/>
+  </object>
+  <object id="87" name="triwall2" x="496.004" y="703.988">
+   <properties>
+    <property name="blocker" value="tlr"/>
+   </properties>
+   <polyline points="0,0 0,-16 16,-16 16,-32 32,-32 32,-48 96,-48 96,-32 112,-32 112,-16 128,-16 128,0 0,0"/>
+  </object>
+  <object id="92" name="passthroughwall" x="736" y="704" width="48" height="16">
+   <properties>
+    <property name="blocker" value="tlr"/>
+   </properties>
+  </object>
+  <object id="94" x="630" y="323.333"/>
+ </objectgroup>
+</map>

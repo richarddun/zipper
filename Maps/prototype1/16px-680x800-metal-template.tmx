@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="79" height="50" tilewidth="16" tileheight="16" nextobjectid="44">
+ <tileset firstgid="1" name="tiles1" tilewidth="16" tileheight="16" tilecount="84" columns="14">
+  <image source="../../Tiles/metal/tiles1.png" width="224" height="96"/>
+ </tileset>
+ <tileset firstgid="85" name="collision" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="182" columns="26">
+  <image source="../../Tiles/collision/collidable.gif" width="480" height="137"/>
+  <tile id="15">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="79" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt2kEKwjAQheHcRxetrnRR3dmF9f7HMYEGilAyTCeQMf/i8RBSMox8BcEhhDCuGQSRnmspFjOPm065xEwxj5iFiJP29dz0KeZMi/r9s8NbzJ0Wdbabd/eKmWlR5/ccZjGLWR+NWcxi1ldjFrOY9dWYxSxmfbVHs1ZnejRrdaZHs1Znapq1MlCK5LkarvfuszBrZaAUyXM1XO/dZ2HWykApkudquN67D7OYxSxmMYtZzGLWs9m0O8zq7kq7wyxmMYtZzGIWs5jF7P+Y5fcsv2cxi1nMYrZXs5q5MaufG7P6ubVmp9DO/6BamEEyS95ZsvsJx3wc7fy9tzDDvH4uve/Szq5EnS9/LHde
+  </data>
+ </layer>
+ <objectgroup name="start" visible="0">
+  <object id="17" name="spwn" x="77" y="435" width="23" height="15" visible="0">
+   <properties>
+    <property name="spawn" type="bool" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="blocker" visible="0">
+  <object id="19" name="platform" x="369.269" y="353.083" width="157.344" height="13.9276" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="20" name="platform" x="513.815" y="368.893" width="60.9802" height="13.5512" visible="0"/>
+  <object id="21" name="platform" x="320.334" y="367.763" width="62.4859" height="14.6804" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="22" name="platform" x="1.4044" y="784.098" width="1260.04" height="13.622" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="23" name="wall" x="0.795482" y="1.59096" width="28.6373" height="781.163" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="25" name="wall" x="1233" y="0" width="28.6373" height="783.549" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="27" name="column" x="943.79" y="431.947" width="80.0328" height="352.151" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="28" name="mound" x="623.846" y="702.759" width="63.6158" height="80.5925" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="30" name="mound" x="592.318" y="752.383" width="31.3415" height="31.5693" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="31" name="platform" x="192.441" y="623.659" width="238.818" height="31.6807" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="33" name="platform" x="512" y="368" width="60.2462" height="13.8696" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="35" name="platform" x="752.427" y="272.625" width="157.767" height="15.1699" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="36" name="platform" x="704.317" y="288.662" width="61.9799" height="13.8696" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="40" name="wall" x="2" y="0" width="1262" height="32" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="41" name="platform" x="896" y="288" width="61.9799" height="13.8696" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+  <object id="42" name="platform" x="130" y="463" width="93" height="16" visible="0">
+   <properties>
+    <property name="blocker" value="bltr"/>
+   </properties>
+  </object>
+  <object id="43" name="platform" x="768.125" y="591.875" width="95.875" height="16.125" visible="0">
+   <properties>
+    <property name="blocker" value="tblr"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
