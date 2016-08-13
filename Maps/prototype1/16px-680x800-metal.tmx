@@ -100,7 +100,7 @@
     <property name="blocker" value="bltr"/>
    </properties>
   </object>
-  <object id="43" name="platform" x="768.125" y="591.875" width="95.875" height="16.125">
+  <object id="43" name="platform" x="768.125" y="591.875" width="95.875" height="16.125" visible="0">
    <properties>
     <property name="blocker" value="tblr"/>
    </properties>

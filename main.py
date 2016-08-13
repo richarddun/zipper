@@ -21,7 +21,7 @@ class ZippyGame(Widget):
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
         self.map = tmx.TileMapWidget(
-            'Maps\prototype1\/16px-680x800-metal.tmx',
+            'Maps\prototype1\/16px-680x800-metal2.tmx',
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
