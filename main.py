@@ -1,3 +1,4 @@
+import pdb
 from kivy.app import App
 from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
@@ -147,13 +148,18 @@ class Player_Sprite(Image):
         also checks for collision with objects
         :return: none
         """
-        self.x += self.movedir.x * (40*params.scale)
-        self.y += self.movedir.y * (40*params.scale)
-        self.coldir = 'n'
-        if self.move_or_collide():
-            self.zipping = False
-        else:
-            self.zipping = True
+        final_point = self.consider_collide(self.movedir.x,self.movedir.y)
+        print str(final_point)
+
+
+        #out with the old
+        #self.x += self.movedir.x * (40*params.scale)
+        #self.y += self.movedir.y * (40*params.scale)
+        #self.coldir = 'n'
+        #if self.move_or_collide():
+        #    self.zipping = False
+        #else:
+        #    self.zipping = True
 
     def update(self, *ignore):
         """
@@ -229,7 +235,8 @@ class Player_Sprite(Image):
                 self.prevdir = 'right'
             if keys.get(Keyboard.keycodes['left']):
                 self.prevdir = 'left'
-            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16), self.size[1]*.29)
+            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
+                             self.size[1]*.29)
             if keys.get(Keyboard.keycodes['x']):
                 Clock.schedule_once(self.atk)
             if not keys.get(Keyboard.keycodes['x']):
@@ -348,6 +355,18 @@ class Player_Sprite(Image):
             return True
         else:
             return False
+
+    def consider_collide(self,pushx,pushy):
+        mynum = 1
+        plotrect = Rect(pushx,pushy,1,1)
+        for cell in self.map.map.layers['blocker'].collide(plotrect, 'blocker'):
+            return pushx,pushy
+        newpushx,newpushy = pushx+1, pushy+1
+        self.consider_collide(newpushx,newpushy)
+
+
+
+
 
 params = params()
 

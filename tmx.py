@@ -19,7 +19,7 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.widget import Widget
 from kivy.graphics import Translate, PushMatrix, PopMatrix
 from kivy.utils import get_color_from_hex
-
+import pdb
 
 class Tile(object):
     '''
