@@ -144,10 +144,23 @@ class Player_Sprite(Image):
                 self.atkcounter += 1
 
     def consider_collide(self,pushx,pushy):
-        self.plotrect = Rect(self.pos[0]+(self.width*.42)+pushx,self.pos[1]+(self.height*.35)+pushy, (self.size[0]*.16), self.size[1]*.29)
+        """
+        method to recursively find the point on a straight line where a collision occurs with
+        tile object containing collision properties (t,b,l,r : top, bottom, left, right)
+        Updates an Rect instance value with the x,y location at the point of collision for
+        later use.  Uses recursion instead of iteration because endpoint is not known prior to
+        calling the method.
+
+        :param pushx: normalised vector describing the direction to move, already pre-computed by the touch angle
+        plus the touch location
+        :param pushy: normalised vector describing the direction to move, already pre-computed by the touch angle
+        plus the touch location
+        :return: always returns None
+        """
+        self.plotrect = Rect(self.pos[0]+pushx,self.pos[1]+pushy, 3, 3)
         numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
         if numnum >= 1:
-            return pushx,pushy
+            return None
         print str(pushx) + str(pushy)
         pushx += self.movedir.x
         pushy += self.movedir.y
@@ -159,9 +172,14 @@ class Player_Sprite(Image):
         also checks for collision with objects
         :return: none
         """
-        final_point = self.consider_collide(self.movedir.x,self.movedir.y)
-        #print str(final_point)
-        self.pos = self.plotrect.bottomleft
+        self.consider_collide(self.movedir.x,self.movedir.y)
+        print str(self.plotrect.bottomleft)
+        za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
+        za_origin = Vector(self.pos)  # Zero Aligned origin
+        za_collider = Vector(za_collide_point - za_origin).normalize()  """ Vector subtraction to find direction from
+                                                                            sprite to collide point"""
+        lastRect = Rect() #TODO - implement last and new Rect comparison to stick sprite correctly at collide point
+
 
 
         #out with the old
@@ -330,13 +348,17 @@ class Player_Sprite(Image):
                 self.y += self.dy
                 self.move_or_collide()
 
-    def move_or_collide(self):
+    def move_or_collide(self, Rect1=None, Rect2=None):
         """
         creates Rect around sprite image at center of transparent image.  Checks for collision, acts appropriately.
         :return: True if collision has occurred, False if not
         """
         blocked = False
-        self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16), self.size[1]*.29)
+        if Rect1 == None:
+            self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
+                            self.size[1]*.29)
+        if Rect2 != None:
+            self.last = Rect2
         """Rect instantiated with x set to where character drawing is, relative to the
          overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
          collision as the character drawing is centered within a larger transparent image"""
