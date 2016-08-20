@@ -1,4 +1,5 @@
 import pdb
+import sys
 from kivy.app import App
 from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
@@ -12,7 +13,7 @@ from collections import defaultdict
 from math import atan2, degrees, pi
 
 keys = defaultdict(lambda: False)
-
+sys.setrecursionlimit(10000)
 class ZippyApp(App):
     def build(self):
         return ZippyGame()
@@ -142,6 +143,16 @@ class Player_Sprite(Image):
                 self.texture = self.atk_images['attack2_r']
                 self.atkcounter += 1
 
+    def consider_collide(self,pushx,pushy):
+        self.plotrect = Rect(self.pos[0]+(self.width*.42)+pushx,self.pos[1]+(self.height*.35)+pushy, (self.size[0]*.16), self.size[1]*.29)
+        numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
+        if numnum >= 1:
+            return pushx,pushy
+        print str(pushx) + str(pushy)
+        pushx += self.movedir.x
+        pushy += self.movedir.y
+        self.consider_collide(pushx,pushy)
+
     def zip(self):
         """
         method to move sprite image along movedir, previously computed by prep_zip.
@@ -149,7 +160,8 @@ class Player_Sprite(Image):
         :return: none
         """
         final_point = self.consider_collide(self.movedir.x,self.movedir.y)
-        print str(final_point)
+        #print str(final_point)
+        self.pos = self.plotrect.bottomleft
 
 
         #out with the old
@@ -355,14 +367,8 @@ class Player_Sprite(Image):
             return True
         else:
             return False
+    #
 
-    def consider_collide(self,pushx,pushy):
-        mynum = 1
-        plotrect = Rect(pushx,pushy,1,1)
-        for cell in self.map.map.layers['blocker'].collide(plotrect, 'blocker'):
-            return pushx,pushy
-        newpushx,newpushy = pushx+1, pushy+1
-        self.consider_collide(newpushx,newpushy)
 
 
 
