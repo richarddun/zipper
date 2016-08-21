@@ -161,7 +161,8 @@ class Player_Sprite(Image):
         numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
         if numnum >= 1:
             return None
-        print str(pushx) + str(pushy)
+        print 'pushx = ' + str(pushx)
+        print 'pushy = ' + str(pushy)
         pushx += self.movedir.x
         pushy += self.movedir.y
         self.consider_collide(pushx,pushy)
@@ -173,23 +174,32 @@ class Player_Sprite(Image):
         :return: none
         """
         self.consider_collide(self.movedir.x,self.movedir.y)
-        print str(self.plotrect.bottomleft)
+        #print str(self.plotrect.bottomleft)
         za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
         za_origin = Vector(self.pos)  # Zero Aligned origin
-        za_collider = Vector(za_collide_point - za_origin).normalize()  """ Vector subtraction to find direction from
-                                                                            sprite to collide point"""
-        lastRect = Rect() #TODO - implement last and new Rect comparison to stick sprite correctly at collide point
+        sa_collider = Vector(za_collide_point - za_origin).normalize()
+        """ Vector subtraction to find direction ^ from sprite to collide point"""
+        len_to_collide = int(round(Vector(sa_collider).length()))
+        print 'za_collide_point = ' + str(za_collide_point)
+        print 'za_oringin = ' + str(za_origin)
+        print 'sa_collider = ' + str(sa_collider)
+        print 'len_to_collide = ' + str(len_to_collide)
 
+        for index,coltick in enumerate(xrange(1, len_to_collide)):
+            lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
+                            +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
+            #  In brief :
+            #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
+            #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide point
+            #  multiplied by index to ensure the 'lastRect' is always 1 iteration behind the 'newRect'
+            #  Next values supplied to Rect are for y location, similar logic
+            #  Further values relate to the height/width of the rect instance which should envelope the inner
+            #  sprite drawing.  For the purposes of this calculation that's not so important.
+            newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
+                            +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
+            #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
+            self.move_or_collide(Rect1=newRect, Rect2=lastRect)
 
-
-        #out with the old
-        #self.x += self.movedir.x * (40*params.scale)
-        #self.y += self.movedir.y * (40*params.scale)
-        #self.coldir = 'n'
-        #if self.move_or_collide():
-        #    self.zipping = False
-        #else:
-        #    self.zipping = True
 
     def update(self, *ignore):
         """
@@ -354,7 +364,9 @@ class Player_Sprite(Image):
         :return: True if collision has occurred, False if not
         """
         blocked = False
-        if Rect1 == None:
+        if Rect1 != None:
+            self.new = Rect1
+        else:
             self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
                             self.size[1]*.29)
         if Rect2 != None:
