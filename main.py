@@ -51,6 +51,7 @@ class Player_Sprite(Image):
         self.atk_images = Atlas("animation\/attack/atk.atlas")
         self.spe_images = Atlas("animation\/special\/specatlas.atlas")
         self.wall_images = Atlas("animation\/special\/wall_anim\/wall.atlas")
+        self.animage = Atlas("animation\/effects\/arrow.atlas")
         self.map = mapz
         self.texture = self.mov_images['walk_1_right']
         self.moving_right = False
@@ -97,7 +98,7 @@ class Player_Sprite(Image):
         self.touching = True
         if not self.zipping:
             self.orientation(touch)
-            self.origin = Vector(*self.new.center)
+            self.origin = Vector(*self.new.center)  #self.new.center
             self.target = Vector(*self.touch_skew)
             self.tgetdir = self.target - self.origin
             self.movedir = self.tgetdir.normalize()
@@ -157,12 +158,12 @@ class Player_Sprite(Image):
         plus the touch location
         :return: always returns None
         """
-        self.plotrect = Rect(self.pos[0]+pushx,self.pos[1]+pushy, 3, 3)
+        self.plotrect = Rect((self.pos[0]+(self.width/2))+pushx,(self.pos[1]+(self.height/2))+pushy, 1, 1)
         numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
         if numnum >= 1:
             return None
-        print 'pushx = ' + str(pushx)
-        print 'pushy = ' + str(pushy)
+        #print 'pushx = ' + str(pushx)
+        #print 'pushy = ' + str(pushy)
         pushx += self.movedir.x
         pushy += self.movedir.y
         self.consider_collide(pushx,pushy)
@@ -173,33 +174,39 @@ class Player_Sprite(Image):
         also checks for collision with objects
         :return: none
         """
-        self.consider_collide(self.movedir.x,self.movedir.y)
-        #print str(self.plotrect.bottomleft)
-        za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
-        za_origin = Vector(self.pos)  # Zero Aligned origin
-        sa_collider = Vector(za_collide_point - za_origin).normalize()
-        """ Vector subtraction to find direction ^ from sprite to collide point"""
-        len_to_collide = int(round(Vector(sa_collider).length()))
-        print 'za_collide_point = ' + str(za_collide_point)
-        print 'za_oringin = ' + str(za_origin)
-        print 'sa_collider = ' + str(sa_collider)
-        print 'len_to_collide = ' + str(len_to_collide)
-
-        for index,coltick in enumerate(xrange(1, len_to_collide)):
-            lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
-                            +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
-            #  In brief :
-            #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
-            #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide point
-            #  multiplied by index to ensure the 'lastRect' is always 1 iteration behind the 'newRect'
-            #  Next values supplied to Rect are for y location, similar logic
-            #  Further values relate to the height/width of the rect instance which should envelope the inner
-            #  sprite drawing.  For the purposes of this calculation that's not so important.
-            newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
-                            +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
-            #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
-            self.move_or_collide(Rect1=newRect, Rect2=lastRect)
-
+        if self.zipctr == 0:
+            self.consider_collide(self.movedir.x,self.movedir.y)
+            #print str(self.plotrect.bottomleft)
+            za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
+            za_origin = Vector(self.pos)  # Zero Aligned origin
+            asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
+            sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
+            #len_to_collide = int(round(asa_collider.length()))
+            len_to_collide = 400
+            #pdb.set_trace()
+            #print 'za_collide_point = ' + str(za_collide_point)
+            #print 'za_origin = ' + str(za_origin)
+            #print 'sa_collider = ' + str(sa_collider)
+            #print 'len_to_collide = ' + str(len_to_collide)
+            self.texture = self.animage['arrow']
+            for index,coltick in enumerate(xrange(1, len_to_collide)):
+                lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
+                                +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
+                #  In brief :
+                #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
+                #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide point
+                #  multiplied by index to ensure the 'lastRect' is always 1 iteration behind the 'newRect'
+                #  Next values supplied to Rect are for y location, similar logic
+                #  Further values relate to the height/width of the rect instance which should envelope the inner
+                #  sprite drawing.  For the purposes of this calculation that's not so important.
+                newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
+                                +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
+                #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
+                if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
+                    break
+            self.pos = self.new.bottomleft[0]-self.width*.42, self.new.bottomleft[1]-self.height*.35
+            self.posref = self.pos
+            self.zipctr = 1
 
     def update(self, *ignore):
         """
@@ -265,6 +272,8 @@ class Player_Sprite(Image):
             if (keys.get(Keyboard.keycodes['z']) or self.zipping):
                 self.resting = True
                 self.zip()
+            if not keys.get(Keyboard.keycodes['z']):
+                self.zipctr = 0
 
             if keys.get(Keyboard.keycodes['c']):
                 self.resting = False
@@ -364,12 +373,12 @@ class Player_Sprite(Image):
         :return: True if collision has occurred, False if not
         """
         blocked = False
-        if Rect1 != None:
+        if Rect1 is not None:
             self.new = Rect1
         else:
             self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
                             self.size[1]*.29)
-        if Rect2 != None:
+        if Rect2 is not None:
             self.last = Rect2
         """Rect instantiated with x set to where character drawing is, relative to the
          overall width of the image (5/12 (42%) of the image, 1/6 wide) for more precise
@@ -401,12 +410,6 @@ class Player_Sprite(Image):
             return True
         else:
             return False
-    #
-
-
-
-
-
 
 params = params()
 
