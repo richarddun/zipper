@@ -136,6 +136,7 @@ class Player_Sprite(Image):
         """
         self.touching = False
         self.coldir = 'n'
+        self.zip()
 
     def atk(self,dt):
         """
