@@ -23,7 +23,7 @@ class ZippyGame(Widget):
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
         self.map = tmx.TileMapWidget(
-            'Maps\prototype1\/16px-680x800-metal2.tmx',
+            'Maps\prototype1\/16px-680x800-metal.tmx',
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
@@ -69,6 +69,8 @@ class Player_Sprite(Image):
         self.zipping = False
         self.sticking = False
         self.coldir = 'n'
+        self.int_image_startpoint = ((self.pos[0]+(self.width*.42)), (self.pos[1]+(self.height*.35)))
+        self.int_image_dimensions = ((self.size[0]*.16), (self.size[1]*.29))
 
     def orientation(self, touch):
         """
@@ -95,6 +97,12 @@ class Player_Sprite(Image):
         :param touch: takes kivy touch as input
         :return: none
         """
+        #self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
+        #                    self.size[1]*.29
+
+        xskew = int(round(self.pos[0]+(self.width*.42)))
+        yskew = int(round(self.pos[1]+(self.height*.35)))
+
         self.touching = True
         if not self.zipping:
             self.orientation(touch)
@@ -158,12 +166,11 @@ class Player_Sprite(Image):
         plus the touch location
         :return: always returns None
         """
-        self.plotrect = Rect((self.pos[0]+(self.width/2))+pushx,(self.pos[1]+(self.height/2))+pushy, 1, 1)
+        self.plotrect = Rect((self.pos[0]+(self.width*.42))+pushx,(self.pos[1]+(self.height*.35))+pushy,
+                             self.size[0]*.16, self.size[1]*.29)
         numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
         if numnum >= 1:
             return None
-        #print 'pushx = ' + str(pushx)
-        #print 'pushy = ' + str(pushy)
         pushx += self.movedir.x
         pushy += self.movedir.y
         self.consider_collide(pushx,pushy)
@@ -176,20 +183,15 @@ class Player_Sprite(Image):
         """
         if self.zipctr == 0:
             self.consider_collide(self.movedir.x,self.movedir.y)
-            #print str(self.plotrect.bottomleft)
             za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
-            za_origin = Vector(self.pos)  # Zero Aligned origin
+            za_origin = Vector(self.new.center)  # Zero Aligned origin
             asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
             sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
             #len_to_collide = int(round(asa_collider.length()))
-            len_to_collide = 400
-            #pdb.set_trace()
-            #print 'za_collide_point = ' + str(za_collide_point)
-            #print 'za_origin = ' + str(za_origin)
-            #print 'sa_collider = ' + str(sa_collider)
-            #print 'len_to_collide = ' + str(len_to_collide)
+            len_to_collide = 200  # Arbitrary number
             self.texture = self.animage['arrow']
             for index,coltick in enumerate(xrange(1, len_to_collide)):
+                self.texture = self.animage['arrow']
                 lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
                                 +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
                 #  In brief :
@@ -202,9 +204,10 @@ class Player_Sprite(Image):
                 newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
                                 +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
                 #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
+
                 if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
                     break
-            self.pos = self.new.bottomleft[0]-self.width*.42, self.new.bottomleft[1]-self.height*.35
+            self.pos = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
             self.posref = self.pos
             self.zipctr = 1
 
