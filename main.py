@@ -192,7 +192,6 @@ class Player_Sprite(Image):
         :param dt: delta-time (unused at present)
         :return: none
         """
-        print "ATTACK!! " + str(self.atkcounter)
         if self.prevdir == 'left':
             if self.atkcounter < 10:  # counter used to prevent animation sticking
                 self.texture = self.atk_images['attack2_l']
@@ -265,94 +264,106 @@ class Player_Sprite(Image):
         :param ignore: unused, reserved for future use
         :return: none
         """
-        self.dx, self.dy = 0, 0
-        if keys.get(Keyboard.keycodes['right']):
-            self.prevdir = 'right'
-        if keys.get(Keyboard.keycodes['left']):
-            self.prevdir = 'left'
-        self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
-                         self.size[1]*.29)
-        if keys.get(Keyboard.keycodes['x']):
-            #Clock.schedule_once(self.atk)
-            self.atk(self.atkcounter)
-        if not keys.get(Keyboard.keycodes['x']):
-            self.atkcounter = 0
+        if (self.touching or self.sticking) or (self.zipping):
 
-        if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
-            if self.moving_right:
-                self.texture = self.mov_images['walk_2_right']
-            elif self.moving_left:
-                self.texture = self.mov_images['walk_2_left']
-            self.jumping = True
-            self.resting = False
-            self.dy = 5 * params.scale
-        elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
-            if self.movyval > 20:
-                self.jumping = False
-                self.movyval = 0
+
+            #if (keys.get(Keyboard.keycodes['z']) or self.zipping):
+            #    self.resting = True
+            #    self.zip()
+            #if not keys.get(Keyboard.keycodes['z']):
+                #self.zipctr = 0
+
+            if keys.get(Keyboard.keycodes['c']):
+                self.resting = False
+
+        else:
+            self.dx, self.dy = 0, 0
+            if keys.get(Keyboard.keycodes['right']):
+                self.prevdir = 'right'
+            if keys.get(Keyboard.keycodes['left']):
+                self.prevdir = 'left'
+            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
+                             self.size[1]*.29)
+            if keys.get(Keyboard.keycodes['x']):
+                Clock.schedule_once(self.atk)
+            if not keys.get(Keyboard.keycodes['x']):
+                self.atkcounter = 0
+
+            if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
                 if self.moving_right:
                     self.texture = self.mov_images['walk_2_right']
                 elif self.moving_left:
                     self.texture = self.mov_images['walk_2_left']
-                self.dy -= 4 * params.scale
-            else:
-                if self.moving_right:
-                    self.texture = self.mov_images['jump_r']
-                elif self.moving_left:
-                    self.texture = self.mov_images['jump_l']
+                self.jumping = True
+                self.resting = False
                 self.dy = 5 * params.scale
-                self.movyval += .5
-        if self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
-            self.jumping = False
-            self.movyval = 0
-        if not self.jumping:
-            if self.moving_right:
-                self.texture = self.mov_images['walk_2_right']
-                self.dy -= 6 * params.scale
-            elif self.moving_left:
-                self.texture = self.mov_images['walk_2_left']
-                self.dy -= 6 * params.scale
-            else:
-                self.dy -= 6 * params.scale
-        if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
-                keys.get(Keyboard.keycodes['right']):
-            self.dx -= 5 * params.scale
-            self.moving_left = True
-            self.moving_right = False
-        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
-                keys.get(Keyboard.keycodes['left']):
-            self.dx += 5 * params.scale
-            self.moving_right = True
-            self.moving_left = False
-        elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
-                keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']):
-            self.moving_left, self.moving_right = False,False
-        elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
-            if self.moving_left and self.resting:
-                self.texture = self.mov_images['walk_1_left']
-                self.moving_left = False
-            elif self.moving_right and self.resting:
-                self.texture = self.mov_images['walk_1_right']
+            elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
+                if self.movyval > 20:
+                    self.jumping = False
+                    self.movyval = 0
+                    if self.moving_right:
+                        self.texture = self.mov_images['walk_2_right']
+                    elif self.moving_left:
+                        self.texture = self.mov_images['walk_2_left']
+                    self.dy -= 4 * params.scale
+                else:
+                    if self.moving_right:
+                        self.texture = self.mov_images['jump_r']
+                    elif self.moving_left:
+                        self.texture = self.mov_images['jump_l']
+                    self.dy = 5 * params.scale
+                    self.movyval += .5
+            if self.jumping and not keys.get(Keyboard.keycodes['spacebar']):
+                self.jumping = False
+                self.movyval = 0
+            if not self.jumping:
+                if self.moving_right:
+                    self.texture = self.mov_images['walk_2_right']
+                    self.dy -= 6 * params.scale
+                elif self.moving_left:
+                    self.texture = self.mov_images['walk_2_left']
+                    self.dy -= 6 * params.scale
+                else:
+                    self.dy -= 6 * params.scale
+            if keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']) and not \
+                    keys.get(Keyboard.keycodes['right']):
+                self.dx -= 5 * params.scale
+                self.moving_left = True
                 self.moving_right = False
-            else:
-                if self.prevdir == 'left':
-                   self.texture = self.mov_images['walk_1_left']
-                elif self.prevdir == 'right':
+            elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and not \
+                    keys.get(Keyboard.keycodes['left']):
+                self.dx += 5 * params.scale
+                self.moving_right = True
+                self.moving_left = False
+            elif keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d']) and \
+                    keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a']):
+                self.moving_left, self.moving_right = False,False
+            elif not self.jumping and not (keys.get(Keyboard.keycodes['right']) and (keys.get(Keyboard.keycodes['left']))):
+                if self.moving_left and self.resting:
+                    self.texture = self.mov_images['walk_1_left']
+                    self.moving_left = False
+                elif self.moving_right and self.resting:
                     self.texture = self.mov_images['walk_1_right']
-        if self.moving_left:
-            if self.jumping:
-                self.texture = self.mov_images['jump_l']
-            else:
-                self.texture = self.mov_images['walk_2_left']
-        if self.moving_right:
-            if self.jumping:
-                self.texture = self.mov_images['jump_r']
-            else:
-                self.texture = self.mov_images['walk_2_right']
-        if not self.zipping:
-            self.x += self.dx
-            self.y += self.dy
-            self.move_or_collide()
+                    self.moving_right = False
+                else:
+                    if self.prevdir == 'left':
+                       self.texture = self.mov_images['walk_1_left']
+                    elif self.prevdir == 'right':
+                        self.texture = self.mov_images['walk_1_right']
+            if self.moving_left:
+                if self.jumping:
+                    self.texture = self.mov_images['jump_l']
+                else:
+                    self.texture = self.mov_images['walk_2_left']
+            if self.moving_right:
+                if self.jumping:
+                    self.texture = self.mov_images['jump_r']
+                else:
+                    self.texture = self.mov_images['walk_2_right']
+            if not self.zipping:
+                self.x += self.dx
+                self.y += self.dy
+                self.move_or_collide()
 
     def move_or_collide(self, Rect1=None, Rect2=None):
         """
