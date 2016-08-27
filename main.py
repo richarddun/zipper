@@ -193,13 +193,9 @@ class Player_Sprite(Image):
         :return: none
         """
         if self.prevdir == 'left':
-            if self.atkcounter < 10:  # counter used to prevent animation sticking
-                self.texture = self.atk_images['attack2_l']
-                self.atkcounter += 1
+            self.texture = self.atk_images['attack2_l']
         elif self.prevdir == 'right':
-            if self.atkcounter < 10:
-                self.texture = self.atk_images['attack2_r']
-                self.atkcounter += 1
+            self.texture = self.atk_images['attack2_r']
 
     def consider_collide(self,pushx,pushy):
         """
@@ -290,7 +286,7 @@ class Player_Sprite(Image):
                 self.moving_left, self.moving_right = False,False
 
             if not self.jumping and self.resting:
-                if not (keys.get(Keyboard.keycodes['right']) and not (keys.get(Keyboard.keycodes['left']))):
+                if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
                     self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
                         else self.mov_images['walk_1_right']
 
@@ -313,12 +309,7 @@ class Player_Sprite(Image):
                 if self.movyval > 20:
                     self.jumping = False
                     self.movyval = 0
-                    self.texture = self.mov_images['walk_2_right'] if self.moving_right \
-                        else self.mov_images['walk_2_left']
-                    self.dy -= 4 * params.scale
                 else:
-                    self.texture = self.mov_images['jump_r'] if self.moving_right \
-                        else self.mov_images['jump_l']
                     self.dy = 5 * params.scale
                     self.movyval += .5
 
@@ -329,7 +320,7 @@ class Player_Sprite(Image):
     def move_or_collide(self, Rect1=None, Rect2=None):
         """
         creates Rect around sprite image at center of transparent image.  Checks for collision, acts appropriately.
-        :return: True if collision has occurred, False if not
+        :return: True if collision has occurred, False if not.  Takes optional arguments of rects to compare
         """
         blocked = False
         if Rect1 is not None:
