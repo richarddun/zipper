@@ -1,3 +1,4 @@
+import time
 import pdb
 import sys
 from kivy.app import App
@@ -222,7 +223,7 @@ class Player_Sprite(Image):
         asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
         sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
         #len_to_collide = int(round(asa_collider.length()))
-        len_to_collide = 200  # Arbitrary number
+        len_to_collide = 200  # Arbitrary number TODO - implement a better method to decide the len of travel
         self.texture = self.animage['arrow']
         for index,coltick in enumerate(xrange(1, len_to_collide)):
             self.texture = self.animage['arrow']
