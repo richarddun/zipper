@@ -106,7 +106,8 @@ class Player_Sprite(Image):
             self.target = Vector(*self.touch_skew)
             self.tgetdir = self.target - self.origin
             self.movedir = self.tgetdir.normalize()
-            #print str(self.bearing)
+
+            # below logic to change the direction of the sprite sword based on input
             if self.coldir == 't' or self.coldir == 'n':
                 if self.bearing >= 0 and self.bearing <= 30:
                     self.texture = self.spe_images['special_r_1']
@@ -145,7 +146,7 @@ class Player_Sprite(Image):
                 elif self.bearing <= -30 and self.bearing > -60:
                     self.texture = self.wall_images['special_lside_5']
                 elif self.bearing <= -60 and self.bearing > -90:
-                    self.texture = self.wall_images['special_lside_5']  # need to add one more sprite for straight down
+                    self.texture = self.wall_images['special_lside_5']  # TODO - need to add one more sprite for straight down
             elif self.coldir == 'l':
                 if self.bearing >= 90 and self.bearing < 120:
                     self.texture = self.wall_images['special_rside_1']
@@ -185,17 +186,6 @@ class Player_Sprite(Image):
         self.touching = False
         self.coldir = 'n'
         self.zip()
-
-    def atk(self,dt):
-        """
-        method to trigger animation for attack with main weapon
-        :param dt: delta-time (unused at present)
-        :return: none
-        """
-        if self.prevdir == 'left':
-            self.texture = self.atk_images['attack2_l']
-        elif self.prevdir == 'right':
-            self.texture = self.atk_images['attack2_r']
 
     def consider_collide(self,pushx,pushy):
         """
@@ -264,47 +254,55 @@ class Player_Sprite(Image):
             if keys.get(Keyboard.keycodes['c']):
                 self.resting = False
         else:
+            # if we were moving before, display a 'standing' image
+            if not self.jumping and self.resting:
+                if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
+                    self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
+                        else self.mov_images['walk_1_right']
+            # initialise the direction on x/y to zero
             self.dx, self.dy = 0, 0
+            # 'last' rect, before movement, for collision detection later on
             self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
                              self.size[1]*.29)
-
+            # move left
             if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
                 self.dx -= 5 * params.scale
                 self.moving_left = True
                 self.moving_right = False
                 self.texture = self.mov_images['walk_2_left'] if not self.jumping else self.mov_images['jump_l']
                 self.prevdir = 'left'
-
+            # move right
             elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
                 self.dx += 5 * params.scale
                 self.moving_right = True
                 self.moving_left = False
                 self.texture = self.mov_images['walk_2_right'] if not self.jumping else self.mov_images['jump_r']
                 self.prevdir = 'right'
-
+            # if both keys pressed, do nothing
             elif keys.get(Keyboard.keycodes['right']) and keys.get(Keyboard.keycodes['left']):
                 self.moving_left, self.moving_right = False,False
-
-            if not self.jumping and self.resting:
-                if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
-                    self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
-                        else self.mov_images['walk_1_right']
-
+            # rudimentary gravity
             if not self.jumping:
                 self.dy -= 6 * params.scale
-
+            # if we were jumping, but have released the key
             if self.jumping:
                 if not keys.get(Keyboard.keycodes['spacebar']):
                     self.jumping = False
                     self.movyval = 0
-
+            # initiate attack animation
             if keys.get(Keyboard.keycodes['x']):
-                Clock.schedule_once(self.atk)
-
+                if self.atkcounter > 20:
+                    self.atkcounter = 0
+                else:
+                    self.texture = self.atk_images['attack2_l'] if self.prevdir == 'left' \
+                        else self.atk_images['attack2_r']
+                    self.atkcounter += 1
+            # initiate a jump
             if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
                 self.jumping = True
                 self.resting = False
                 self.dy = 5 * params.scale
+            # there's a peak to every jump, after which, no more vertical movement
             elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
                 if self.movyval > 20:
                     self.jumping = False
@@ -312,9 +310,10 @@ class Player_Sprite(Image):
                 else:
                     self.dy = 5 * params.scale
                     self.movyval += .5
-
+            # update the sprite x/y
             self.x += self.dx
             self.y += self.dy
+            # push through Rect based collision detection
             self.move_or_collide()
 
     def move_or_collide(self, Rect1=None, Rect2=None):
