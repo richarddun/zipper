@@ -10,6 +10,7 @@ from kivy.uix.progressbar import ProgressBar
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
+from kivy.properties import NumericProperty, BooleanProperty
 import tmx
 from rect import Rect
 from collections import defaultdict
@@ -50,6 +51,8 @@ class params(object):
         self.scale = self.height / 256.      # 21 tile size * 12
 
 class Player_Sprite(Image):
+    angle = NumericProperty(0)
+    ziptest = BooleanProperty(True)
     def __init__(self,pos,mapz,**kwargs):
         super(Player_Sprite,self).__init__(pos=pos,size=(195,164),*kwargs)
         #  (pos=pos, size=(192,81),*kwargs)
@@ -61,11 +64,13 @@ class Player_Sprite(Image):
         self.map = mapz
         self.texture = self.mov_images['walk_2_right']
         self.moving_right = False
-        self.resting = True
+        self.resting = False
         self.moving_left = False
         self.movyval = 0
         self.suspended = 0
         self.jumping = False
+        self.animlen = 300
+        self.animduration = .08
         self.prevdir = 'right'
         self.atkcounter = 0
         self.touching = False
@@ -75,6 +80,11 @@ class Player_Sprite(Image):
         self.zipping = False
         self.sticking = False
         self.coldir = 'n'
+
+    def notzipping(self, *args):
+        self.zipping = False
+        self.touching = False
+        self.resting = True
 
     def orientation(self, touch):
         """
@@ -102,6 +112,8 @@ class Player_Sprite(Image):
         :return: none
         """
         self.touching = True
+        self.resting = False
+        self.zipping = True
         #if not self.zipping:
         self.orientation(touch)
         self.origin = Vector(*self.new.center)  #self.new.center
@@ -229,7 +241,7 @@ class Player_Sprite(Image):
         asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
         sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
         #len_to_collide = int(round(asa_collider.length()))
-        len_to_collide = 600  # Arbitrary number TODO - implement a better method to decide the len of travel
+        len_to_collide = self.animlen  # Arbitrary number TODO - implement a better method to decide the len of travel
         for index,coltick in enumerate(xrange(1, len_to_collide)):
             lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
                             +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
@@ -247,14 +259,10 @@ class Player_Sprite(Image):
             if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
                 break
         self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
-        anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=5)
+        anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
         anim.start(self)
-        self.posref = self.pos
-        self.zipping = False
-        print 'not zipping!!11!'
+        Clock.schedule_once(self.notzipping,self.animduration)
 
-    def null(self):
-        pass
     def update(self, *ignore):
         """
         main update method, handles character movement logic and animation updates
@@ -262,10 +270,10 @@ class Player_Sprite(Image):
         :return: none
         """
         if self.touching or self.sticking or self.zipping:
-            print 'touching or sticking or zipping!!11!'
+            pass
         else:
             # if we were moving before, display a 'standing' image
-            if not self.jumping and self.resting and not self.zipping:
+            if self.resting and not self.zipping:
                 if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
                     self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
                         else self.mov_images['walk_1_right']

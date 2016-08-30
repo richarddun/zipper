@@ -1,4 +1,10 @@
-<ZippyGame>
-
-
-<Player_sprite>
+#<Image@Player_sprite>:
+#    canvas.before:
+#    PushMatrix
+#    Rotate:
+#        angle: self.bearing
+#        origin: self.center
+#    canvas:
+#
+#    canvas.after:
+#        PopMatrix
