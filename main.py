@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.progressbar import ProgressBar
 from kivy.clock import Clock
 from kivy.vector import Vector
+from kivy.animation import Animation
 import tmx
 from rect import Rect
 from collections import defaultdict
@@ -58,7 +59,7 @@ class Player_Sprite(Image):
         self.wall_images = Atlas("animation\/special\/wall_anim\/wall.atlas")
         self.animage = Atlas("animation\/effects\/arrow.atlas")
         self.map = mapz
-        self.texture = self.mov_images['walk_1_right']
+        self.texture = self.mov_images['walk_2_right']
         self.moving_right = False
         self.resting = True
         self.moving_left = False
@@ -101,66 +102,66 @@ class Player_Sprite(Image):
         :return: none
         """
         self.touching = True
-        if not self.zipping:
-            self.orientation(touch)
-            self.origin = Vector(*self.new.center)  #self.new.center
-            self.target = Vector(*self.touch_skew)
-            self.tgetdir = self.target - self.origin
-            self.movedir = self.tgetdir.normalize()
+        #if not self.zipping:
+        self.orientation(touch)
+        self.origin = Vector(*self.new.center)  #self.new.center
+        self.target = Vector(*self.touch_skew)
+        self.tgetdir = self.target - self.origin
+        self.movedir = self.tgetdir.normalize()
 
-            # below logic to change the direction of the sprite sword based on input
-            if self.coldir == 't' or self.coldir == 'n':
-                if self.bearing >= 0 and self.bearing <= 30:
-                    self.texture = self.spe_images['special_r_1']
-                elif self.bearing > 30 and self.bearing <= 60:
-                    self.texture = self.spe_images['special_r_2']
-                elif self.bearing > 60 and self.bearing <= 90:
-                    self.texture = self.spe_images['special_r_3']
-                elif self.bearing > 90 and self.bearing <= 120:
-                    self.texture = self.spe_images['special_l_3']
-                elif self.bearing > 120 and self.bearing <= 150:
-                    self.texture = self.spe_images['special_l_2']
-                elif self.bearing > 150 and self.bearing <= 180:
-                    self.texture = self.spe_images['special_l_1']
-            elif self.coldir == 'b':
-                if self.bearing <= 0 and self.bearing >= -30:
-                    self.texture = self.spe_images['special_r_1_u']
-                elif self.bearing < -30 and self.bearing >= -60:
-                    self.texture = self.spe_images['special_r_2_u']
-                elif self.bearing < -60 and self.bearing >= -90:
-                    self.texture = self.spe_images['special_r_3_u']
-                elif self.bearing < -90 and self.bearing >= -120:
-                    self.texture = self.spe_images['special_l_3_u']
-                elif self.bearing < -120 and self.bearing >= -150:
-                    self.texture = self.spe_images['special_l_2_u']
-                elif self.bearing < -150 and self.bearing >= -180:
-                    self.texture = self.spe_images['special_l_1_u']
-            elif self.coldir == 'r':
-                if self.bearing <= 90 and self.bearing > 60:
-                    self.texture = self.wall_images['special_lside_1']
-                elif self.bearing <= 60 and self.bearing > 30:
-                    self.texture = self.wall_images['special_lside_2']
-                elif self.bearing <= 30 and self.bearing >0:
-                    self.texture = self.wall_images['special_lside_3']
-                elif self.bearing <= 0 and self.bearing > -30:
-                    self.texture = self.wall_images['special_lside_4']
-                elif self.bearing <= -30 and self.bearing > -60:
-                    self.texture = self.wall_images['special_lside_5']
-                elif self.bearing <= -60 and self.bearing > -90:
-                    self.texture = self.wall_images['special_lside_5']  # TODO - need to add one more sprite for straight down
-            elif self.coldir == 'l':
-                if self.bearing >= 90 and self.bearing < 120:
-                    self.texture = self.wall_images['special_rside_1']
-                elif self.bearing >= 120 and self.bearing < 150 :
-                    self.texture = self.wall_images['special_rside_2']
-                elif self.bearing >= 150 and self.bearing < 180:
-                    self.texture = self.wall_images['special_rside_3']
-                elif self.bearing > -180 and self.bearing < -150:
-                    self.texture = self.wall_images['special_rside_4']
-                elif self.bearing >= -150 and self.bearing < -120:
-                    self.texture = self.wall_images['special_rside_5']
-                elif self.bearing >= -120 and self.bearing < -90:
-                    self.texture = self.wall_images['special_rside_5']
+        # below logic to change the direction of the sprite sword based on input
+        if self.coldir == 't' or self.coldir == 'n':
+            if self.bearing >= 0 and self.bearing <= 30:
+                self.texture = self.spe_images['special_r_1']
+            elif self.bearing > 30 and self.bearing <= 60:
+                self.texture = self.spe_images['special_r_2']
+            elif self.bearing > 60 and self.bearing <= 90:
+                self.texture = self.spe_images['special_r_3']
+            elif self.bearing > 90 and self.bearing <= 120:
+                self.texture = self.spe_images['special_l_3']
+            elif self.bearing > 120 and self.bearing <= 150:
+                self.texture = self.spe_images['special_l_2']
+            elif self.bearing > 150 and self.bearing <= 180:
+                self.texture = self.spe_images['special_l_1']
+        elif self.coldir == 'b':
+            if self.bearing <= 0 and self.bearing >= -30:
+                self.texture = self.spe_images['special_r_1_u']
+            elif self.bearing < -30 and self.bearing >= -60:
+                self.texture = self.spe_images['special_r_2_u']
+            elif self.bearing < -60 and self.bearing >= -90:
+                self.texture = self.spe_images['special_r_3_u']
+            elif self.bearing < -90 and self.bearing >= -120:
+                self.texture = self.spe_images['special_l_3_u']
+            elif self.bearing < -120 and self.bearing >= -150:
+                self.texture = self.spe_images['special_l_2_u']
+            elif self.bearing < -150 and self.bearing >= -180:
+                self.texture = self.spe_images['special_l_1_u']
+        elif self.coldir == 'r':
+            if self.bearing <= 90 and self.bearing > 60:
+                self.texture = self.wall_images['special_lside_1']
+            elif self.bearing <= 60 and self.bearing > 30:
+                self.texture = self.wall_images['special_lside_2']
+            elif self.bearing <= 30 and self.bearing >0:
+                self.texture = self.wall_images['special_lside_3']
+            elif self.bearing <= 0 and self.bearing > -30:
+                self.texture = self.wall_images['special_lside_4']
+            elif self.bearing <= -30 and self.bearing > -60:
+                self.texture = self.wall_images['special_lside_5']
+            elif self.bearing <= -60 and self.bearing > -90:
+                self.texture = self.wall_images['special_lside_5']  # TODO - need to add one more sprite for straight down
+        elif self.coldir == 'l':
+            if self.bearing >= 90 and self.bearing < 120:
+                self.texture = self.wall_images['special_rside_1']
+            elif self.bearing >= 120 and self.bearing < 150 :
+                self.texture = self.wall_images['special_rside_2']
+            elif self.bearing >= 150 and self.bearing < 180:
+                self.texture = self.wall_images['special_rside_3']
+            elif self.bearing > -180 and self.bearing < -150:
+                self.texture = self.wall_images['special_rside_4']
+            elif self.bearing >= -150 and self.bearing < -120:
+                self.texture = self.wall_images['special_rside_5']
+            elif self.bearing >= -120 and self.bearing < -90:
+                self.texture = self.wall_images['special_rside_5']
 
     def on_touch_down(self, touch):
         """
@@ -185,8 +186,10 @@ class Player_Sprite(Image):
         :return: none
         """
         self.touching = False
+        self.zipping = True
         self.coldir = 'n'
-        self.zip()
+        trigger = Clock.create_trigger(self.zip)
+        trigger()
 
     def consider_collide(self,pushx,pushy):
         """
@@ -211,22 +214,23 @@ class Player_Sprite(Image):
         pushy += self.movedir.y
         self.consider_collide(pushx,pushy)
 
-    def zip(self):
+    def zip(self, *ignore):
         """
         method to move sprite image along movedir, previously computed by prep_zip.
         also checks for collision with objects
         :return: none
         """
+
+        self.texture = self.animage['arrow']
         self.consider_collide(self.movedir.x,self.movedir.y)
+        self.zipping = True
         za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
         za_origin = Vector(self.new.center)  # Zero Aligned origin
         asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
         sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
         #len_to_collide = int(round(asa_collider.length()))
-        len_to_collide = 200  # Arbitrary number TODO - implement a better method to decide the len of travel
-        self.texture = self.animage['arrow']
+        len_to_collide = 600  # Arbitrary number TODO - implement a better method to decide the len of travel
         for index,coltick in enumerate(xrange(1, len_to_collide)):
-            self.texture = self.animage['arrow']
             lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
                             +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
             #  In brief :
@@ -242,21 +246,26 @@ class Player_Sprite(Image):
 
             if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
                 break
-        self.pos = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
+        self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
+        anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=5)
+        anim.start(self)
         self.posref = self.pos
+        self.zipping = False
+        print 'not zipping!!11!'
 
+    def null(self):
+        pass
     def update(self, *ignore):
         """
         main update method, handles character movement logic and animation updates
         :param ignore: unused, reserved for future use
         :return: none
         """
-        if (self.touching or self.sticking) or (self.zipping):
-            if keys.get(Keyboard.keycodes['c']):
-                self.resting = False
+        if self.touching or self.sticking or self.zipping:
+            print 'touching or sticking or zipping!!11!'
         else:
             # if we were moving before, display a 'standing' image
-            if not self.jumping and self.resting:
+            if not self.jumping and self.resting and not self.zipping:
                 if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
                     self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
                         else self.mov_images['walk_1_right']
