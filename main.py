@@ -31,8 +31,8 @@ class ZippyGame(Widget):
             'Maps\prototype1\/16px-680x800-metal.tmx',
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
-        self.pb = ProgressBar()
-        self.pb.value = 500
+        #self.pb = ProgressBar()
+        #self.pb.value = 500
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
@@ -52,7 +52,8 @@ class params(object):
 
 class Player_Sprite(Image):
     angle = NumericProperty(0)
-    ziptest = BooleanProperty(True)
+    bearing = NumericProperty(0)
+    zipping = BooleanProperty(True)
     def __init__(self,pos,mapz,**kwargs):
         super(Player_Sprite,self).__init__(pos=pos,size=(195,164),*kwargs)
         #  (pos=pos, size=(192,81),*kwargs)
@@ -80,6 +81,7 @@ class Player_Sprite(Image):
         self.zipping = False
         self.sticking = False
         self.coldir = 'n'
+        self.bearing = 90
 
     def notzipping(self, *args):
         self.zipping = False
@@ -113,7 +115,6 @@ class Player_Sprite(Image):
         """
         self.touching = True
         self.resting = False
-        self.zipping = True
         #if not self.zipping:
         self.orientation(touch)
         self.origin = Vector(*self.new.center)  #self.new.center
@@ -198,7 +199,6 @@ class Player_Sprite(Image):
         :return: none
         """
         self.touching = False
-        self.zipping = True
         self.coldir = 'n'
         trigger = Clock.create_trigger(self.zip)
         trigger()
