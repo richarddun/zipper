@@ -14,7 +14,7 @@ To test it out :
 
 Controls : 
 
-- a,d = move left,right
+- left arrow, right arrow = move left,right
 - spacebar = jump
 - x = attack with sword
 - left mouse click (and hold) - aim character

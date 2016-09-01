@@ -283,21 +283,22 @@ class Player_Sprite(Image):
             self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
                              self.size[1]*.29)
             # move left
-            if keys.get(Keyboard.keycodes['left']) and not keys.get(Keyboard.keycodes['right']):
+            if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) and not keys.get(Keyboard.keycodes['right']):
                 self.dx -= 5 * params.scale
                 self.moving_left = True
                 self.moving_right = False
                 self.texture = self.mov_images['walk_2_left'] if not self.jumping else self.mov_images['jump_l']
                 self.prevdir = 'left'
             # move right
-            elif keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
+            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and not keys.get(Keyboard.keycodes['left']):
                 self.dx += 5 * params.scale
                 self.moving_right = True
                 self.moving_left = False
                 self.texture = self.mov_images['walk_2_right'] if not self.jumping else self.mov_images['jump_r']
                 self.prevdir = 'right'
             # if both keys pressed, do nothing
-            elif keys.get(Keyboard.keycodes['right']) and keys.get(Keyboard.keycodes['left']):
+            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and \
+                    (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])):
                 self.moving_left, self.moving_right = False,False
             # rudimentary gravity
             if not self.jumping:
