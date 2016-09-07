@@ -32,10 +32,6 @@ class BaseMap(tmx.TileMapWidget):
 
 class ZippyGame(Widget):
 
-    windowx = NumericProperty(0)
-    windowy = NumericProperty(0)
-    windowpos = ReferenceListProperty(windowx,windowy)
-
     def __init__(self):
         super(ZippyGame,self).__init__()
         tempscale = Window.height / 256.
