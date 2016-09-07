@@ -6,11 +6,10 @@ from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
 from kivy.atlas import Atlas
 from kivy.uix.widget import Widget
-from kivy.uix.progressbar import ProgressBar
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
-from kivy.properties import NumericProperty, BooleanProperty
+from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty
 import tmx
 from rect import Rect
 from collections import defaultdict
@@ -23,24 +22,38 @@ class ZippyApp(App):
     def build(self):
         return ZippyGame()
 
+class ZipMeter(Widget):
+    def __init__(self, *args, **kwargs):
+        super(ZipMeter, self).__init__(*args, **kwargs)
+
+class BaseMap(tmx.TileMapWidget):
+    def __init__(self, filename,viewport,scale):
+        super(BaseMap, self).__init__(filename,viewport,scale)
+
 class ZippyGame(Widget):
-    def __init__(self, **kwargs):
-        super(ZippyGame,self).__init__(**kwargs)
+
+    windowx = NumericProperty(0)
+    windowy = NumericProperty(0)
+    windowpos = ReferenceListProperty(windowx,windowy)
+
+    def __init__(self):
+        super(ZippyGame,self).__init__()
         tempscale = Window.height / 256.
-        self.map = tmx.TileMapWidget(
+        self.map = BaseMap(
             'Maps\prototype1\/16px-680x800-metal.tmx',
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
-        #self.pb = ProgressBar()
-        #self.pb.value = 500
+        self.pb = ZipMeter()
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
+        self.sprite.add_widget(self.pb)
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
         self.sprite.update()
         self.map.set_focus(*self.sprite.pos)
+        self.windowpos = self.sprite.map.map.viewport.topleft
 
 class params(object):
     """
@@ -53,9 +66,12 @@ class params(object):
 class Player_Sprite(Image):
     angle = NumericProperty(0)
     bearing = NumericProperty(0)
+    animlen = NumericProperty(300)
     zipping = BooleanProperty(True)
-    def __init__(self,pos,mapz,**kwargs):
-        super(Player_Sprite,self).__init__(pos=pos,size=(195,164),*kwargs)
+
+
+    def __init__(self,pos,mapz):
+        super(Player_Sprite,self).__init__(pos=pos,size=(195,164))
         #  (pos=pos, size=(192,81),*kwargs)
         self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
         self.atk_images = Atlas("animation\/attack/atk.atlas")
@@ -269,6 +285,12 @@ class Player_Sprite(Image):
         :param ignore: unused, reserved for future use
         :return: none
         """
+        self.windowx = self.map.map.viewport.bottomleft[0]
+        self.windowy = self.map.map.viewport.bottomleft[1]
+        self.windowpos = (self.windowx,self.windowy)
+        #self.update_meterpos()
+        #print str(self.windowpos)
+
         if self.touching or self.sticking or self.zipping:
             pass
         else:

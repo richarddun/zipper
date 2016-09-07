@@ -1,12 +1,24 @@
-<ZippyGame>:
-<Player_Sprite>:
+#ZippyGame:
+#    BaseMap:
+#    Player_Sprite:
+#
+#        canvas.before:
+#            PushMatrix
+#            Rotate:
+#                angle: self.bearing if self.zipping == True else 0
+#                origin: self.center
+#        canvas:
+#
+#        canvas.after:
+#            PopMatrix
 
-    canvas.before:
-        PushMatrix
-        Rotate:
-            angle: self.bearing if self.zipping == True else 0
-            origin: self.center
-    canvas:
+ #   ZipMeter:
+ ##       FloatLayout:
+  #          pos: root.windowpos
+   #         Label:
+    #            text:'blahblah'
 
-    canvas.after:
-        PopMatrix
+
+
+
+
