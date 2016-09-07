@@ -1,22 +1,39 @@
-#ZippyGame:
-#    BaseMap:
-#    Player_Sprite:
-#
-#        canvas.before:
-#            PushMatrix
-#            Rotate:
-#                angle: self.bearing if self.zipping == True else 0
-#                origin: self.center
-#        canvas:
-#
-#        canvas.after:
-#            PopMatrix
+ZippyGame:
 
- #   ZipMeter:
- ##       FloatLayout:
-  #          pos: root.windowpos
-   #         Label:
-    #            text:'blahblah'
+<BaseMap>:
+
+
+<ZipMeter>:
+    size:
+        200,50
+    canvas:
+        Color:
+            rgba: 1,0,0,.4
+        Rectangle:
+            size: self.size
+    Widget:
+        size:
+            100,25
+        canvas:
+            Color:
+                rgba: 0,1,0,.3
+            Rectangle:
+                size:self.size
+
+
+<Player_Sprite>:
+
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.bearing if self.zipping == True else 0
+            origin: self.center
+    canvas:
+
+    canvas.after:
+        PopMatrix
+
+
 
 
 

@@ -47,13 +47,12 @@ class ZippyGame(Widget):
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
-        self.sprite.add_widget(self.pb)
+        self.add_widget(self.pb)
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
         self.sprite.update()
         self.map.set_focus(*self.sprite.pos)
-        self.windowpos = self.sprite.map.map.viewport.topleft
 
 class params(object):
     """
@@ -285,12 +284,6 @@ class Player_Sprite(Image):
         :param ignore: unused, reserved for future use
         :return: none
         """
-        self.windowx = self.map.map.viewport.bottomleft[0]
-        self.windowy = self.map.map.viewport.bottomleft[1]
-        self.windowpos = (self.windowx,self.windowy)
-        #self.update_meterpos()
-        #print str(self.windowpos)
-
         if self.touching or self.sticking or self.zipping:
             pass
         else:
