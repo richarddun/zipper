@@ -1,15 +1,25 @@
 ZippyGame:
 
+<ZippyGame>:
+
 <BaseMap>:
 
 <ZipMeter>:
-    pos:500,500
-    canvas:
-        Color:
-            rgba: 0,1,0,.3
-        Rectangle:
-            size:self.size
-            pos: self.pos
+    Image:
+        id:base
+        source:'animation\effects\enbar_noback.png'
+        pos:20,root.height-self.height
+
+    Image:
+        id:hp
+        pos:base.x+3,base.y+10
+        source:'animation\effects\hbar.png'
+
+    Image:
+        id:mp
+        pos:hp.x, hp.y - 15
+        source:'animation\effects\mpbar.png'
+
 
 <Player_Sprite>:
     canvas.before:

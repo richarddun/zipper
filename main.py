@@ -23,7 +23,7 @@ class ZippyApp(App):
     def build(self):
         return ZippyGame()
 
-class ZipMeter(FloatLayout):
+class ZipMeter(Widget):
     def __init__(self, *args, **kwargs):
         super(ZipMeter, self).__init__(*args, **kwargs)
 
@@ -31,10 +31,10 @@ class BaseMap(tmx.TileMapWidget):
     def __init__(self, filename,viewport,scale):
         super(BaseMap, self).__init__(filename,viewport,scale)
 
-class ZippyGame(Widget):
+class ZippyGame(FloatLayout):
 
-    def __init__(self):
-        super(ZippyGame,self).__init__()
+    def __init__(self,**kwargs):
+        super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
         self.map = BaseMap(
             'Maps\prototype1\/16px-680x800-metal.tmx',
