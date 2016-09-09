@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
+from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty
 import tmx
 from rect import Rect
@@ -22,7 +23,7 @@ class ZippyApp(App):
     def build(self):
         return ZippyGame()
 
-class ZipMeter(Widget):
+class ZipMeter(FloatLayout):
     def __init__(self, *args, **kwargs):
         super(ZipMeter, self).__init__(*args, **kwargs)
 
@@ -39,11 +40,11 @@ class ZippyGame(Widget):
             'Maps\prototype1\/16px-680x800-metal.tmx',
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
-        self.pb = ZipMeter()
+        self.zipmeter = ZipMeter()
         self.sprite = Player_Sprite((spawn.px,spawn.py),self.map)
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
-        self.add_widget(self.pb)
+        self.add_widget(self.zipmeter)
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):

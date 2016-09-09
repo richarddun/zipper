@@ -2,27 +2,16 @@ ZippyGame:
 
 <BaseMap>:
 
-
 <ZipMeter>:
-    size:
-        200,50
+    pos:500,500
     canvas:
         Color:
-            rgba: 1,0,0,.4
+            rgba: 0,1,0,.3
         Rectangle:
-            size: self.size
-    Widget:
-        size:
-            100,25
-        canvas:
-            Color:
-                rgba: 0,1,0,.3
-            Rectangle:
-                size:self.size
-
+            size:self.size
+            pos: self.pos
 
 <Player_Sprite>:
-
     canvas.before:
         PushMatrix
         Rotate:
