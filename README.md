@@ -1,5 +1,7 @@
 # zipper
-Zipper - Action Adventure Platform game implemented in Kivy  
+Zipper - Action Adventure Platform game implemented in Kivy 
+
+![Zipper](zippy_screenshot?raw=true)
 
 2D platform game, with a focus on reflex and character agility.
 
