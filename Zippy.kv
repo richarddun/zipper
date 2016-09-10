@@ -1,25 +1,37 @@
 ZippyGame:
 
 <ZippyGame>:
-
 <BaseMap>:
-
 <ZipMeter>:
+    #Turns out that using a layout is a better idea.
+    #ZipMeter is a FloatLayout
+
+    #Character HP/MP bar(s)
+
     Image:
         id:base
         source:'animation\effects\enbar_noback.png'
-        pos:20,root.height-self.height
+        pos_hint:{'x':.06,'y':.8}
+        size_hint:.19,.19
+        #Above values found with trial and error
 
     Image:
         id:hp
-        pos:base.x+3,base.y+10
+        keep_ratio:False
+        allow_stretch:True
+        pos_hint:{'x':.064,'y':.90}
         source:'animation\effects\hbar.png'
+        size_hint:.180,.030
+        #Above values found with trial and error
 
     Image:
         id:mp
-        pos:hp.x, hp.y - 15
+        keep_ratio:False
+        allow_stretch:True
+        pos_hint:{'x':.064,'y':.86}
         source:'animation\effects\mpbar.png'
-
+        size_hint:.180,.030
+        #Above values found with trial and error
 
 <Player_Sprite>:
     canvas.before:

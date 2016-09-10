@@ -23,7 +23,7 @@ class ZippyApp(App):
     def build(self):
         return ZippyGame()
 
-class ZipMeter(Widget):
+class ZipMeter(FloatLayout):
     def __init__(self, *args, **kwargs):
         super(ZipMeter, self).__init__(*args, **kwargs)
 
