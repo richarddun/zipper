@@ -17,11 +17,11 @@ ZippyGame:
 
     Image:
         id:hp
-        keep_ratio:False
+        keep_ratio:True
         allow_stretch:True
         pos_hint:{'x':.064,'y':.90}
         source:'animation\effects\hbar.png'
-        size_hint:.180,.030
+        size_hint:root.hplevel,.030
         #Above values found with trial and error
 
     Image:
@@ -30,7 +30,7 @@ ZippyGame:
         allow_stretch:True
         pos_hint:{'x':.064,'y':.86}
         source:'animation\effects\mpbar.png'
-        size_hint:.180,.030
+        size_hint:root.mplevel,.030
         #Above values found with trial and error
 
 <Player_Sprite>:
@@ -43,10 +43,3 @@ ZippyGame:
 
     canvas.after:
         PopMatrix
-
-
-
-
-
-
-

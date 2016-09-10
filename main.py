@@ -24,15 +24,38 @@ class ZippyApp(App):
         return ZippyGame()
 
 class ZipMeter(FloatLayout):
+    mplevel = NumericProperty(.180)
+    hplevel = NumericProperty(.180)
     def __init__(self, *args, **kwargs):
         super(ZipMeter, self).__init__(*args, **kwargs)
+        self.mplevel = .180
+        self.hplevel = .180
+        print self.mplevel
+
+    def lose_bar(self,type,chunk=None):
+        if self.mplevel > .001 and type == 'MP':
+            self.mplevel -= .001
+        elif self.hplevel > .001 and type == 'HP':
+            self.hplevel -= .001
+
+    def gain_bar(self, type,chunk=None):
+        if self.mplevel < .180 and type == 'MP':
+            self.mplevel += .001
+        elif self.hplevel < .180 and type == 'HP':
+            self.hplevel += .001
+
+    def get_barlevel(self, type):
+        if type == 'MP':
+            return self.mplevel
+        elif type == 'HP':
+            return self.hplevel
 
 class BaseMap(tmx.TileMapWidget):
     def __init__(self, filename,viewport,scale):
         super(BaseMap, self).__init__(filename,viewport,scale)
 
-class ZippyGame(FloatLayout):
 
+class ZippyGame(FloatLayout):
     def __init__(self,**kwargs):
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
@@ -48,8 +71,83 @@ class ZippyGame(FloatLayout):
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
-        self.sprite.update()
+        self.update_sprite()
         self.map.set_focus(*self.sprite.pos)
+
+    def update_sprite(self, *ignore):
+        """
+        main update method, handles character movement logic and animation updates
+        :param ignore: unused, reserved for future use
+        :return: none
+        """
+        if self.sprite.touching or self.sprite.sticking or self.sprite.zipping:
+            self.zipmeter.lose_bar('MP')
+        else:
+            self.zipmeter.gain_bar('MP')
+            # if we were moving before, display a 'standing' image
+            if self.sprite.resting and not self.sprite.zipping:
+                if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
+                    self.sprite.texture = self.sprite.mov_images['walk_1_left'] if self.sprite.prevdir == 'left' \
+                        else self.sprite.mov_images['walk_1_right']
+            # initialise the direction on x/y to zero
+            self.sprite.dx, self.sprite.dy = 0, 0
+            # 'last' rect, before movement, for collision detection later on
+            self.sprite.last = Rect(self.sprite.pos[0]+(self.sprite.width*.42),self.sprite.pos[1]+(self.sprite.height*.35), (self.sprite.size[0]*.16),
+                             self.sprite.size[1]*.29)
+            # move left
+            if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) and not keys.get(Keyboard.keycodes['right']):
+                self.sprite.dx -= 5 * params.scale
+                self.sprite.moving_left = True
+                self.sprite.moving_right = False
+                self.sprite.texture = self.sprite.mov_images['walk_2_left'] if not self.sprite.jumping else self.sprite.mov_images['jump_l']
+                self.sprite.prevdir = 'left'
+            # move right
+            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and not keys.get(Keyboard.keycodes['left']):
+                self.sprite.dx += 5 * params.scale
+                self.sprite.moving_right = True
+                self.sprite.moving_left = False
+                self.sprite.texture = self.sprite.mov_images['walk_2_right'] if not self.sprite.jumping else self.sprite.mov_images['jump_r']
+                self.sprite.prevdir = 'right'
+            # if both keys pressed, do nothing
+            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and \
+                    (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])):
+                self.sprite.moving_left, self.sprite.moving_right = False,False
+            # rudimentary gravity
+            if not self.sprite.jumping:
+                self.sprite.dy -= 6 * params.scale
+            # if we were jumping, but have released the key
+            if self.sprite.jumping:
+                if not keys.get(Keyboard.keycodes['spacebar']):
+                    self.sprite.jumping = False
+                    self.sprite.movyval = 0
+            # initiate attack animation
+            if keys.get(Keyboard.keycodes['x']):
+                if self.sprite.atkcounter > 20:
+                    self.sprite.atkcounter = 0
+                else:
+                    self.sprite.texture = self.sprite.atk_images['attack2_l'] if self.sprite.prevdir == 'left' \
+                        else self.sprite.atk_images['attack2_r']
+                    self.sprite.atkcounter += 1
+            # initiate a jump
+            if keys.get(Keyboard.keycodes['spacebar']) and self.sprite.resting:
+                self.sprite.jumping = True
+                self.sprite.resting = False
+                self.sprite.dy = 5 * params.scale
+            # there's a peak to every jump, after which, no more vertical movement
+            elif keys.get(Keyboard.keycodes['spacebar']) and self.sprite.jumping:
+                if self.sprite.movyval > 20:
+                    self.sprite.jumping = False
+                    self.sprite.movyval = 0
+                else:
+                    self.sprite.dy = 5 * params.scale
+                    self.sprite.movyval += .5
+            # update the sprite x/y
+            self.sprite.x += self.sprite.dx
+            self.sprite.y += self.sprite.dy
+            # push through Rect based collision detection
+            self.sprite.move_or_collide()
+
+
 
 class params(object):
     """
@@ -82,7 +180,7 @@ class Player_Sprite(Image):
         self.movyval = 0
         self.suspended = 0
         self.jumping = False
-        self.animlen = 300
+        self.animlen = 0
         self.animduration = .08
         self.prevdir = 'right'
         self.atkcounter = 0
@@ -244,108 +342,39 @@ class Player_Sprite(Image):
         also checks for collision with objects
         :return: none
         """
-
         self.texture = self.animage['arrow']
         self.consider_collide(self.movedir.x,self.movedir.y)
-        self.zipping = True
         za_collide_point = Vector(self.plotrect.center)  # Zero Aligned collide point
         za_origin = Vector(self.new.center)  # Zero Aligned origin
         asa_collider = za_collide_point - za_origin  # Need the length of the true vector before normalisation
         sa_collider = asa_collider.normalize()  # Now normalise for use in iteration later
         #len_to_collide = int(round(asa_collider.length()))
         len_to_collide = self.animlen  # Arbitrary number TODO - implement a better method to decide the len of travel
-        for index,coltick in enumerate(xrange(1, len_to_collide)):
-            lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
-                            +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
-            #  In brief :
-            #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
-            #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide point
-            #  multiplied by index to ensure the 'lastRect' is always 1 iteration behind the 'newRect'
-            #  Next values supplied to Rect are for y location, similar logic
-            #  Further values relate to the height/width of the rect instance which should envelope the inner
-            #  sprite drawing.  For the purposes of this calculation that's not so important.
-            newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
-                            +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
-            #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
+        if len_to_collide > 0:  # added to ensure 0 length handling, as it's instantiated as zero
+            self.zipping = True
+            for index,coltick in enumerate(xrange(1, len_to_collide)):
+                lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
+                                +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
+                #  In brief :
+                #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
+                #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide
+                #  point multiplied by index to ensure the 'lastRect' is always 1 iteration behind the 'newRect'
+                #  Next values supplied to Rect are for y location, similar logic
+                #  Further values relate to the height/width of the rect instance which should envelope the inner
+                #  sprite drawing.  For the purposes of this calculation that's not so important.
+                newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
+                                +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
+                #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
 
-            if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
-                break
-        self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
-        anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
-        anim.start(self)
-        Clock.schedule_once(self.notzipping,self.animduration)
+                if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
+                    break
+            self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
+            anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
+            anim.start(self)
+            Clock.schedule_once(self.notzipping,self.animduration)
 
-    def update(self, *ignore):
-        """
-        main update method, handles character movement logic and animation updates
-        :param ignore: unused, reserved for future use
-        :return: none
-        """
-        if self.touching or self.sticking or self.zipping:
-            pass
-        else:
-            # if we were moving before, display a 'standing' image
-            if self.resting and not self.zipping:
-                if not keys.get(Keyboard.keycodes['right']) and not keys.get(Keyboard.keycodes['left']):
-                    self.texture = self.mov_images['walk_1_left'] if self.prevdir == 'left' \
-                        else self.mov_images['walk_1_right']
-            # initialise the direction on x/y to zero
-            self.dx, self.dy = 0, 0
-            # 'last' rect, before movement, for collision detection later on
-            self.last = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
-                             self.size[1]*.29)
-            # move left
-            if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) and not keys.get(Keyboard.keycodes['right']):
-                self.dx -= 5 * params.scale
-                self.moving_left = True
-                self.moving_right = False
-                self.texture = self.mov_images['walk_2_left'] if not self.jumping else self.mov_images['jump_l']
-                self.prevdir = 'left'
-            # move right
-            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and not keys.get(Keyboard.keycodes['left']):
-                self.dx += 5 * params.scale
-                self.moving_right = True
-                self.moving_left = False
-                self.texture = self.mov_images['walk_2_right'] if not self.jumping else self.mov_images['jump_r']
-                self.prevdir = 'right'
-            # if both keys pressed, do nothing
-            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and \
-                    (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])):
-                self.moving_left, self.moving_right = False,False
-            # rudimentary gravity
-            if not self.jumping:
-                self.dy -= 6 * params.scale
-            # if we were jumping, but have released the key
-            if self.jumping:
-                if not keys.get(Keyboard.keycodes['spacebar']):
-                    self.jumping = False
-                    self.movyval = 0
-            # initiate attack animation
-            if keys.get(Keyboard.keycodes['x']):
-                if self.atkcounter > 20:
-                    self.atkcounter = 0
-                else:
-                    self.texture = self.atk_images['attack2_l'] if self.prevdir == 'left' \
-                        else self.atk_images['attack2_r']
-                    self.atkcounter += 1
-            # initiate a jump
-            if keys.get(Keyboard.keycodes['spacebar']) and self.resting:
-                self.jumping = True
-                self.resting = False
-                self.dy = 5 * params.scale
-            # there's a peak to every jump, after which, no more vertical movement
-            elif keys.get(Keyboard.keycodes['spacebar']) and self.jumping:
-                if self.movyval > 20:
-                    self.jumping = False
-                    self.movyval = 0
-                else:
-                    self.dy = 5 * params.scale
-                    self.movyval += .5
-            # update the sprite x/y
-            self.x += self.dx
-            self.y += self.dy
-            # push through Rect based collision detection
-            self.move_or_collide()
+
+
 
     def move_or_collide(self, Rect1=None, Rect2=None):
         """
