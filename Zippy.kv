@@ -10,6 +10,7 @@ ZippyGame:
 
     Image:
         id:base
+        allow_stretch:False
         source:'animation\effects\enbar_noback.png'
         pos_hint:{'x':.06,'y':.8}
         size_hint:.19,.19
@@ -18,7 +19,7 @@ ZippyGame:
     Image:
         id:hp
         keep_ratio:True
-        allow_stretch:True
+        allow_stretch:False
         pos_hint:{'x':.064,'y':.90}
         source:'animation\effects\hbar.png'
         size_hint:root.hplevel,.030

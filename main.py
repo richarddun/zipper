@@ -30,11 +30,10 @@ class ZipMeter(FloatLayout):
         super(ZipMeter, self).__init__(*args, **kwargs)
         self.mplevel = .180
         self.hplevel = .180
-        print self.mplevel
 
     def lose_bar(self,type,chunk=None):
         if self.mplevel > .001 and type == 'MP':
-            self.mplevel -= .001
+            self.mplevel -= .002
         elif self.hplevel > .001 and type == 'HP':
             self.hplevel -= .001
 
@@ -68,6 +67,7 @@ class ZippyGame(FloatLayout):
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
         self.add_widget(self.zipmeter)
+        print self.zipmeter.mplevel
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
@@ -82,6 +82,7 @@ class ZippyGame(FloatLayout):
         """
         if self.sprite.touching or self.sprite.sticking or self.sprite.zipping:
             self.zipmeter.lose_bar('MP')
+            self.sprite.animlen += 10
         else:
             self.zipmeter.gain_bar('MP')
             # if we were moving before, display a 'standing' image
@@ -370,6 +371,7 @@ class Player_Sprite(Image):
                     break
             self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
             anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
+            self.animlen = 0
             anim.start(self)
             Clock.schedule_once(self.notzipping,self.animduration)
 
