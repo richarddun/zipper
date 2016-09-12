@@ -10,7 +10,7 @@ from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty
+from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty, ObjectProperty
 import tmx
 from rect import Rect
 from collections import defaultdict
@@ -24,24 +24,31 @@ class ZippyApp(App):
         return ZippyGame()
 
 class ZipMeter(FloatLayout):
-    mplevel = NumericProperty(.180)
-    hplevel = NumericProperty(.180)
+    mplevelmodifier = NumericProperty(0)
+    hplevelmodifier = NumericProperty(0)
+    mplevel = NumericProperty(0)
+    hplevel = NumericProperty(0)
+    width = NumericProperty(0)
+    height = NumericProperty(0)
     def __init__(self, *args, **kwargs):
+        self.mplevelmodifier = 0
+        self.hplevelmodifier = 0
+        self.width, self.height = Window.size
+        self.scale = self.height / 256.      # 21 tile size * 12
+        self.origlevels = self.hplevel = self.mplevel = self.scale * 57 #  Len of the HP/MP bar
         super(ZipMeter, self).__init__(*args, **kwargs)
-        self.mplevel = .180
-        self.hplevel = .180
 
     def lose_bar(self,type,chunk=None):
-        if self.mplevel > .001 and type == 'MP':
-            self.mplevel -= .002
-        elif self.hplevel > .001 and type == 'HP':
-            self.hplevel -= .001
+        if self.mplevel > 0 and type == 'MP':
+            self.mplevel -= 1
+        elif self.hplevel > 0 and type == 'HP':
+            self.hplevel -= 5
 
     def gain_bar(self, type,chunk=None):
-        if self.mplevel < .180 and type == 'MP':
-            self.mplevel += .001
-        elif self.hplevel < .180 and type == 'HP':
-            self.hplevel += .001
+        if self.mplevel < self.origlevels and type == 'MP':
+            self.mplevel += .5
+        elif self.hplevel < self.origlevels and type == 'HP':
+            self.hplevel += 5
 
     def get_barlevel(self, type):
         if type == 'MP':
@@ -67,7 +74,6 @@ class ZippyGame(FloatLayout):
         self.add_widget(self.map)
         self.map.add_widget(self.sprite)
         self.add_widget(self.zipmeter)
-        print self.zipmeter.mplevel
         Clock.schedule_interval(self.update, 1.0/60.0)
 
     def update(self, *ignore):
@@ -81,8 +87,9 @@ class ZippyGame(FloatLayout):
         :return: none
         """
         if self.sprite.touching or self.sprite.sticking or self.sprite.zipping:
-            self.zipmeter.lose_bar('MP')
-            self.sprite.animlen += 10
+            if self.zipmeter.mplevel > 0:
+                self.zipmeter.lose_bar('MP')
+                self.sprite.animlen += 10
         else:
             self.zipmeter.gain_bar('MP')
             # if we were moving before, display a 'standing' image
@@ -373,7 +380,7 @@ class Player_Sprite(Image):
             anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
             self.animlen = 0
             anim.start(self)
-            Clock.schedule_once(self.notzipping,self.animduration)
+            Clock.schedule_once(self.notzipping,self.animduration)  # schedule the logic updates after animation ends
 
 
 

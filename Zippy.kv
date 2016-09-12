@@ -7,32 +7,35 @@ ZippyGame:
     #ZipMeter is a FloatLayout
 
     #Character HP/MP bar(s)
-
     Image:
         id:base
         allow_stretch:False
         source:'animation\effects\enbar_noback.png'
-        pos_hint:{'x':.06,'y':.8}
-        size_hint:.19,.19
+        pos:1, root.height - self.height
+        size_hint:None,None
+        size: 60*root.scale,60*root.scale
         #Above values found with trial and error
 
     Image:
         id:hp
         keep_ratio:True
         allow_stretch:False
-        pos_hint:{'x':.064,'y':.90}
+        pos:4,base.pos[1]+73
         source:'animation\effects\hbar.png'
-        size_hint:root.hplevel,.030
+        size_hint:None,None
+        size:root.hplevel,8*root.scale
         #Above values found with trial and error
 
     Image:
         id:mp
         keep_ratio:False
         allow_stretch:True
-        pos_hint:{'x':.064,'y':.86}
+        #pos_hint:{'x':.064,'y':.86}
+        pos:4,base.pos[1]+53
         source:'animation\effects\mpbar.png'
-        size_hint:root.mplevel,.030
-        #Above values found with trial and error
+        size_hint:None,None
+        size:root.mplevel,7*root.scale
+       #Above values found with trial and error
 
 <Player_Sprite>:
     canvas.before:
