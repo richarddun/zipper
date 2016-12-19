@@ -122,7 +122,7 @@ class ZippyGame(FloatLayout):
                 self.sprite.moving_left, self.sprite.moving_right = False,False
             # rudimentary gravity
             if not self.sprite.jumping:
-                self.sprite.dy -= 6 * params.scale
+                self.sprite.dy -= 4 * params.scale
             # if we were jumping, but have released the key
             if self.sprite.jumping:
                 if not keys.get(Keyboard.keycodes['spacebar']):
