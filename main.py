@@ -1,6 +1,7 @@
 import time
 import pdb
 import sys
+import os
 from kivy.app import App
 from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
@@ -10,7 +11,7 @@ from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty, ObjectProperty
+from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty, ObjectProperty,StringProperty
 import tmx
 from rect import Rect
 from collections import defaultdict
@@ -30,12 +31,17 @@ class ZipMeter(FloatLayout):
     hplevel = NumericProperty(0)
     width = NumericProperty(0)
     height = NumericProperty(0)
+    mpimg = StringProperty()
+    hpimg = StringProperty()
+    baseimg = StringProperty()
+
     def __init__(self, *args, **kwargs):
         self.mplevelmodifier = 0
         self.hplevelmodifier = 0
         self.width, self.height = Window.size
         self.scale = self.height / 256.      # 21 tile size * 12
         self.origlevels = self.hplevel = self.mplevel = self.scale * 57 #  Len of the HP/MP bar
+
         super(ZipMeter, self).__init__(*args, **kwargs)
 
     def lose_bar(self,type,chunk=None):
@@ -63,10 +69,13 @@ class BaseMap(tmx.TileMapWidget):
 
 class ZippyGame(FloatLayout):
     def __init__(self,**kwargs):
+        self.baseimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','enbar_noback.png'))
+        self.hpimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','hbar.png'))
+        self.mpimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','mpbar.png'))
+
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
-        self.map = BaseMap(
-            'Maps\prototype1\/16px-680x800-metal.tmx',
+        self.map = BaseMap(os.path.abspath(os.path.join(os.path.dirname('__file__'),'Maps','prototype1','16px-680x800-metal.tmx')),
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
         self.zipmeter = ZipMeter()
@@ -175,11 +184,11 @@ class Player_Sprite(Image):
     def __init__(self,pos,mapz):
         super(Player_Sprite,self).__init__(pos=pos,size=(195,164))
         #  (pos=pos, size=(192,81),*kwargs)
-        self.mov_images = Atlas("animation\/movement\/animatlas.atlas")
-        self.atk_images = Atlas("animation\/attack/atk.atlas")
-        self.spe_images = Atlas("animation\/special\/specatlas.atlas")
-        self.wall_images = Atlas("animation\/special\/wall_anim\/wall.atlas")
-        self.animage = Atlas("animation\/effects\/arrow.atlas")
+        self.mov_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','movement','animatlas.atlas')))
+        self.atk_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','attack','atk.atlas')))
+        self.spe_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','special','specatlas.atlas')))
+        self.wall_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','special','wall_anim','wall.atlas')))
+        self.animage = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','arrow.atlas')))
         self.map = mapz
         self.texture = self.mov_images['walk_2_right']
         self.moving_right = False
