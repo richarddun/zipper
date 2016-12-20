@@ -10,7 +10,7 @@ ZippyGame:
     Image:
         id:base
         allow_stretch:False
-        source:'animation\effects\enbar_noback.png'
+        source:root.baseimg
         pos:1, root.height - self.height
         size_hint:None,None
         size: 60*root.scale,60*root.scale
@@ -21,7 +21,7 @@ ZippyGame:
         keep_ratio:True
         allow_stretch:False
         pos:4,base.pos[1]+73
-        source:'animation\effects\hbar.png'
+        source:root.hpimg
         size_hint:None,None
         size:root.hplevel,8*root.scale
         #Above values found with trial and error
@@ -32,7 +32,7 @@ ZippyGame:
         allow_stretch:True
         #pos_hint:{'x':.064,'y':.86}
         pos:4,base.pos[1]+53
-        source:'animation\effects\mpbar.png'
+        source:root.mpimg
         size_hint:None,None
         size:root.mplevel,7*root.scale
        #Above values found with trial and error
