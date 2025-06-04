@@ -171,11 +171,17 @@ class Rect(object):
         >>> r1.clippedBy(r2)
         True
         '''
-        if self.intersects(other): return True
-        if i.x > self.x: return True
-        if i.y > self.y: return True
-        if i.width < self.width: return True
-        if i.height < self.height: return True
+        i = self.intersect(other)
+        if i is None:
+            return True
+        if i.x > self.x:
+            return True
+        if i.y > self.y:
+            return True
+        if i.width < self.width:
+            return True
+        if i.height < self.height:
+            return True
         return False
 
     def intersect(self, other):
