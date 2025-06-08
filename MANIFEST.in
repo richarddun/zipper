@@ -1,0 +1,4 @@
+include README.md LICENSE Zippy.kv zippy_screenshot.png
+recursive-include Maps *
+recursive-include Tiles *
+recursive-include animation *

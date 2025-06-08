@@ -21,7 +21,7 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.widget import Widget
 from kivy.graphics import Translate, PushMatrix, PopMatrix
 from kivy.utils import get_color_from_hex
-import pdb
+import logging
 
 class Tile(object):
     '''
@@ -53,7 +53,7 @@ class Tile(object):
             self.properties[name] = value
 
     def __repr__(self):
-        return '<Tile %d>' % self.gid
+        return f'<Tile {self.gid}>'
 
 
 class Tileset(object):
@@ -111,7 +111,7 @@ class Tileset(object):
         texture = Image(source=file).texture
         texture.mag_filter = 'nearest'
         if texture is None:
-            sys.exit('failed to locate image file %r' % file)
+            sys.exit(f'failed to locate image file {file!r}')
 
         id = self.firstgid
         th = self.tile_height + self.spacing
@@ -174,7 +174,7 @@ class Cell(object):
         self._deleted_properties = set()
 
     def __repr__(self):
-        return '<Cell %s,%s %d>' % (self.px, self.py, self.tile.gid)
+        return f'<Cell {self.px},{self.py} {self.tile.gid}>'
 
     def __contains__(self, key):
         if key in self._deleted_properties:
@@ -267,7 +267,7 @@ class Layer(object):
         self.cells = {}
 
     def __repr__(self):
-        return '<Layer "%s" at 0x%x>' % (self.name, id(self))
+        return f'<Layer "{self.name}" at 0x{id(self):x}>'
 
     def __getitem__(self, pos):
         return self.cells.get(pos)
@@ -287,14 +287,16 @@ class Layer(object):
 
         data = tag.find('data')
         if data is None:
-            raise ValueError('layer %s does not contain <data>' % layer.name)
+            raise ValueError(f'layer {layer.name} does not contain <data>')
 
         data = data.text.strip()
+
         data = base64.b64decode(data)
         data = zlib.decompress(data)
         data = struct.unpack('<%di' % (len(data) // 4,), data)
         assert len(data) == layer.width * layer.height, "data len (%d) != width (%d) x height (%d)" % (
         len(data), layer.width, layer.height)
+        
         for i, gid in enumerate(data):
             if gid < 1: continue  # not set
             tile = map.tilesets[gid]
@@ -434,9 +436,9 @@ class Object(object):
 
     def __repr__(self):
         if self.tile:
-            return '<Object %s,%s %s,%s tile=%d>' % (self.px, self.py, self.width, self.height, self.gid)
+            return f'<Object {self.px},{self.py} {self.width},{self.height} tile={self.gid}>'
         else:
-            return '<Object %s,%s %s,%s>' % (self.px, self.py, self.width, self.height)
+            return f'<Object {self.px},{self.py} {self.width},{self.height}>'
 
     def __contains__(self, key):
         if key in self._deleted_properties:
@@ -535,7 +537,7 @@ class ObjectLayer(object):
         self.properties = {}
 
     def __repr__(self):
-        return '<ObjectLayer "%s" at 0x%x>' % (self.name, id(self))
+        return f'<ObjectLayer "{self.name}" at 0x{id(self):x}>'
 
     def __iter__(self):
         return iter(self.objects)
