@@ -369,7 +369,7 @@ class Player_Sprite(Image):
         len_to_collide = self.animlen  # Arbitrary number TODO - implement a better method to decide the len of travel
         if len_to_collide > 0:  # added to ensure 0 length handling, as it's instantiated as zero
             self.zipping = True
-            for index,coltick in enumerate(xrange(1, len_to_collide)):
+            for index,coltick in enumerate(range(1, len_to_collide)):
                 lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
                                 +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
                 #  In brief :

@@ -74,6 +74,9 @@ class Rect(object):
     def __nonzero__(self):
         return bool(self.width and self.height)
 
+    # Python 3.x truthiness support
+    __bool__ = __nonzero__
+
     def __repr__(self):
         return 'Rect(xy=%.4g,%.4g; wh=%.4g,%.4g)'%(self.x, self.y,
             self.width, self.height)
