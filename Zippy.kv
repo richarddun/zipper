@@ -1,41 +1,48 @@
+#:import dp kivy.metrics.dp
 ZippyGame:
 
 <ZippyGame>:
 <BaseMap>:
 <ZipMeter>:
-    #Turns out that using a layout is a better idea.
-    #ZipMeter is a FloatLayout
+    # Use layouts and dp units rather than hard coded offsets
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'top'
+        padding: dp(1)
+        size_hint: None, None
+        size: dp(60), dp(60)
 
-    #Character HP/MP bar(s)
-    Image:
-        id:base
-        allow_stretch:False
-        source:root.baseimg
-        pos:1, root.height - self.height
-        size_hint:None,None
-        size: 60*root.scale,60*root.scale
-        #Above values found with trial and error
+        # Background image
+        Image:
+            id: base
+            allow_stretch: False
+            source: root.baseimg
+            size_hint: None, None
+            size: dp(60), dp(60)
 
-    Image:
-        id:hp
-        keep_ratio:True
-        allow_stretch:False
-        pos:4,base.pos[1]+73
-        source:root.hpimg
-        size_hint:None,None
-        size:root.hplevel,8*root.scale
-        #Above values found with trial and error
+        # Container for the HP/MP bars
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            size: dp(56), dp(20)
+            padding: [dp(4), dp(8), 0, 0]
+            spacing: dp(4)
 
-    Image:
-        id:mp
-        keep_ratio:False
-        allow_stretch:True
-        #pos_hint:{'x':.064,'y':.86}
-        pos:4,base.pos[1]+53
-        source:root.mpimg
-        size_hint:None,None
-        size:root.mplevel,7*root.scale
-       #Above values found with trial and error
+            Image:
+                id: hp
+                keep_ratio: True
+                allow_stretch: False
+                source: root.hpimg
+                size_hint: None, None
+                size: root.hplevel, dp(8)
+
+            Image:
+                id: mp
+                keep_ratio: False
+                allow_stretch: True
+                source: root.mpimg
+                size_hint: None, None
+                size: root.mplevel, dp(7)
 
 <Player_Sprite>:
     canvas.before:
