@@ -18,7 +18,6 @@ from collections import defaultdict
 from math import atan2, degrees, pi
 
 keys = defaultdict(lambda: False)
-sys.setrecursionlimit(10000)
 
 class ZippyApp(App):
     def build(self):
@@ -332,26 +331,22 @@ class Player_Sprite(Image):
 
     def consider_collide(self,pushx,pushy):
         """
-        method to recursively find the point on a straight line where a collision occurs with
-        tile object containing collision properties (t,b,l,r : top, bottom, left, right)
-        Updates an Rect instance value with the x,y location at the point of collision for
-        later use.  Uses recursion instead of iteration because endpoint is not known prior to
-        calling the method.
+        Step along ``movedir`` until a blocking tile is found, recording the
+        collision point in ``plotrect``.
 
-        :param pushx: normalised vector describing the direction to move, already pre-computed by the touch angle
-        plus the touch location
-        :param pushy: normalised vector describing the direction to move, already pre-computed by the touch angle
-        plus the touch location
-        :return: always returns None
+        :param pushx: initial x step based on the normalised movement vector
+        :param pushy: initial y step based on the normalised movement vector
+        :return: ``None``
         """
-        self.plotrect = Rect((self.pos[0]+(self.width*.42))+pushx,(self.pos[1]+(self.height*.35))+pushy,
-                             self.size[0]*.16, self.size[1]*.29)
-        numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
-        if numnum >= 1:
-            return None
-        pushx += self.movedir.x
-        pushy += self.movedir.y
-        self.consider_collide(pushx,pushy)
+        while True:
+            self.plotrect = Rect((self.pos[0]+(self.width*.42))+pushx,
+                                 (self.pos[1]+(self.height*.35))+pushy,
+                                 self.size[0]*.16, self.size[1]*.29)
+            numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
+            if numnum >= 1:
+                break
+            pushx += self.movedir.x
+            pushy += self.movedir.y
 
     def zip(self, *ignore):
         """
