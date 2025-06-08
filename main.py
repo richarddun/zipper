@@ -174,6 +174,56 @@ class params(object):
         self.width, self.height = Window.size
         self.scale = self.height / 256.      # 21 tile size * 12
 
+# helper to select texture based on bearing and collision direction
+def get_texture_for_bearing(bearing, coldir, spe_images, wall_images):
+    """Return texture based on bearing angle and collision direction."""
+    lookup = {
+        "t": [
+            (0, 30, spe_images["special_r_1"]),
+            (30, 60, spe_images["special_r_2"]),
+            (60, 90, spe_images["special_r_3"]),
+            (90, 120, spe_images["special_l_3"]),
+            (120, 150, spe_images["special_l_2"]),
+            (150, 180, spe_images["special_l_1"]),
+        ],
+        "n": [
+            (0, 30, spe_images["special_r_1"]),
+            (30, 60, spe_images["special_r_2"]),
+            (60, 90, spe_images["special_r_3"]),
+            (90, 120, spe_images["special_l_3"]),
+            (120, 150, spe_images["special_l_2"]),
+            (150, 180, spe_images["special_l_1"]),
+        ],
+        "b": [
+            (-30, 0, spe_images["special_r_1_u"]),
+            (-60, -30, spe_images["special_r_2_u"]),
+            (-90, -60, spe_images["special_r_3_u"]),
+            (-120, -90, spe_images["special_l_3_u"]),
+            (-150, -120, spe_images["special_l_2_u"]),
+            (-180, -150, spe_images["special_l_1_u"]),
+        ],
+        "r": [
+            (60, 90, wall_images["special_lside_1"]),
+            (30, 60, wall_images["special_lside_2"]),
+            (0, 30, wall_images["special_lside_3"]),
+            (-30, 0, wall_images["special_lside_4"]),
+            (-60, -30, wall_images["special_lside_5"]),
+            (-90, -60, wall_images["special_lside_5"]),
+        ],
+        "l": [
+            (90, 120, wall_images["special_rside_1"]),
+            (120, 150, wall_images["special_rside_2"]),
+            (150, 180, wall_images["special_rside_3"]),
+            (-180, -150, wall_images["special_rside_4"]),
+            (-150, -120, wall_images["special_rside_5"]),
+            (-120, -90, wall_images["special_rside_5"]),
+        ],
+    }
+    for low, high, tex in lookup.get(coldir, []):
+        if low <= bearing <= high or high <= bearing <= low:
+            return tex
+    return None
+
 class Player_Sprite(Image):
     angle = NumericProperty(0)
     bearing = NumericProperty(0)
@@ -248,60 +298,10 @@ class Player_Sprite(Image):
         self.target = Vector(*self.touch_skew)
         self.tgetdir = self.target - self.origin
         self.movedir = self.tgetdir.normalize()
-
         # below logic to change the direction of the sprite sword based on input
-        if self.coldir == 't' or self.coldir == 'n':
-            if self.bearing >= 0 and self.bearing <= 30:
-                self.texture = self.spe_images['special_r_1']
-            elif self.bearing > 30 and self.bearing <= 60:
-                self.texture = self.spe_images['special_r_2']
-            elif self.bearing > 60 and self.bearing <= 90:
-                self.texture = self.spe_images['special_r_3']
-            elif self.bearing > 90 and self.bearing <= 120:
-                self.texture = self.spe_images['special_l_3']
-            elif self.bearing > 120 and self.bearing <= 150:
-                self.texture = self.spe_images['special_l_2']
-            elif self.bearing > 150 and self.bearing <= 180:
-                self.texture = self.spe_images['special_l_1']
-        elif self.coldir == 'b':
-            if self.bearing <= 0 and self.bearing >= -30:
-                self.texture = self.spe_images['special_r_1_u']
-            elif self.bearing < -30 and self.bearing >= -60:
-                self.texture = self.spe_images['special_r_2_u']
-            elif self.bearing < -60 and self.bearing >= -90:
-                self.texture = self.spe_images['special_r_3_u']
-            elif self.bearing < -90 and self.bearing >= -120:
-                self.texture = self.spe_images['special_l_3_u']
-            elif self.bearing < -120 and self.bearing >= -150:
-                self.texture = self.spe_images['special_l_2_u']
-            elif self.bearing < -150 and self.bearing >= -180:
-                self.texture = self.spe_images['special_l_1_u']
-        elif self.coldir == 'r':
-            if self.bearing <= 90 and self.bearing > 60:
-                self.texture = self.wall_images['special_lside_1']
-            elif self.bearing <= 60 and self.bearing > 30:
-                self.texture = self.wall_images['special_lside_2']
-            elif self.bearing <= 30 and self.bearing >0:
-                self.texture = self.wall_images['special_lside_3']
-            elif self.bearing <= 0 and self.bearing > -30:
-                self.texture = self.wall_images['special_lside_4']
-            elif self.bearing <= -30 and self.bearing > -60:
-                self.texture = self.wall_images['special_lside_5']
-            elif self.bearing <= -60 and self.bearing > -90:
-                self.texture = self.wall_images['special_lside_5']  # TODO - need to add one more sprite for straight down
-        elif self.coldir == 'l':
-            if self.bearing >= 90 and self.bearing < 120:
-                self.texture = self.wall_images['special_rside_1']
-            elif self.bearing >= 120 and self.bearing < 150 :
-                self.texture = self.wall_images['special_rside_2']
-            elif self.bearing >= 150 and self.bearing < 180:
-                self.texture = self.wall_images['special_rside_3']
-            elif self.bearing > -180 and self.bearing < -150:
-                self.texture = self.wall_images['special_rside_4']
-            elif self.bearing >= -150 and self.bearing < -120:
-                self.texture = self.wall_images['special_rside_5']
-            elif self.bearing >= -120 and self.bearing < -90:
-                self.texture = self.wall_images['special_rside_5']
+        texture = get_texture_for_bearing(self.bearing, self.coldir, self.spe_images, self.wall_images)
+        if texture:
+            self.texture = texture
 
     def on_touch_down(self, touch):
         """
