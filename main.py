@@ -1,17 +1,14 @@
-import time
-import logging
 import sys
 import os
 from kivy.app import App
 from kivy.core.window import Window, Keyboard
 from kivy.uix.image import Image
 from kivy.atlas import Atlas
-from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.animation import Animation
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty, ObjectProperty,StringProperty
+from kivy.properties import NumericProperty, BooleanProperty, StringProperty
 import tmx
 from rect import Rect
 from collections import defaultdict
