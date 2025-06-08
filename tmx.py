@@ -10,9 +10,11 @@ import struct
 from xml.etree import ElementTree
 from rect import Rect
 
+import base64
+import zlib
 import kivy
 
-kivy.require('1.8.0')
+kivy.require('2.2.0')
 
 from kivy.uix.image import Image
 from kivy.graphics import Rectangle, Color
@@ -114,8 +116,8 @@ class Tileset(object):
         id = self.firstgid
         th = self.tile_height + self.spacing
         tw = self.tile_width + self.spacing
-        for j in xrange(texture.height / th):
-            for i in xrange(texture.width / tw):
+        for j in range(texture.height // th):
+            for i in range(texture.width // tw):
                 x = (i * tw) + self.margin
                 # convert the y coordinate to OpenGL (0 at bottom of texture)
                 y = texture.height - ((j + 1) * th)
@@ -288,8 +290,9 @@ class Layer(object):
             raise ValueError('layer %s does not contain <data>' % layer.name)
 
         data = data.text.strip()
-        data = data.decode('base64').decode('zlib')
-        data = struct.unpack('<%di' % (len(data) / 4,), data)
+        data = base64.b64decode(data)
+        data = zlib.decompress(data)
+        data = struct.unpack('<%di' % (len(data) // 4,), data)
         assert len(data) == layer.width * layer.height, "data len (%d) != width (%d) x height (%d)" % (
         len(data), layer.width, layer.height)
         for i, gid in enumerate(data):
