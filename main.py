@@ -17,6 +17,10 @@ from rect import Rect
 from collections import defaultdict
 from math import atan2, degrees, pi
 
+# constants describing the offset of the active hitbox inside the sprite image
+HITBOX_OFFSET_X = 0.42
+HITBOX_OFFSET_Y = 0.35
+
 keys = defaultdict(lambda: False)
 sys.setrecursionlimit(10000)
 
@@ -109,8 +113,12 @@ class ZippyGame(FloatLayout):
             # initialise the direction on x/y to zero
             self.sprite.dx, self.sprite.dy = 0, 0
             # 'last' rect, before movement, for collision detection later on
-            self.sprite.last = Rect(self.sprite.pos[0]+(self.sprite.width*.42),self.sprite.pos[1]+(self.sprite.height*.35), (self.sprite.size[0]*.16),
-                             self.sprite.size[1]*.29)
+            self.sprite.last = Rect(
+                self.sprite.pos[0] + (self.sprite.width * HITBOX_OFFSET_X),
+                self.sprite.pos[1] + (self.sprite.height * HITBOX_OFFSET_Y),
+                (self.sprite.size[0] * .16),
+                self.sprite.size[1] * .29,
+            )
             # move left
             if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) and not keys.get(Keyboard.keycodes['right']):
                 self.sprite.dx -= 5 * params.scale
@@ -344,8 +352,12 @@ class Player_Sprite(Image):
         plus the touch location
         :return: always returns None
         """
-        self.plotrect = Rect((self.pos[0]+(self.width*.42))+pushx,(self.pos[1]+(self.height*.35))+pushy,
-                             self.size[0]*.16, self.size[1]*.29)
+        self.plotrect = Rect(
+            (self.pos[0] + (self.width * HITBOX_OFFSET_X)) + pushx,
+            (self.pos[1] + (self.height * HITBOX_OFFSET_Y)) + pushy,
+            self.size[0] * .16,
+            self.size[1] * .29,
+        )
         numnum = len(self.map.map.layers['blocker'].collide(self.plotrect, 'blocker'))
         if numnum >= 1:
             return None
@@ -370,8 +382,12 @@ class Player_Sprite(Image):
         if len_to_collide > 0:  # added to ensure 0 length handling, as it's instantiated as zero
             self.zipping = True
             for index,coltick in enumerate(range(1, len_to_collide)):
-                lastRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*index), self.pos[1]+(self.height*.35)
-                                +(sa_collider[1]*index),(self.size[0]*.16), self.size[1]*.29)
+                lastRect = Rect(
+                    self.pos[0] + (self.width * HITBOX_OFFSET_X) + (sa_collider[0] * index),
+                    self.pos[1] + (self.height * HITBOX_OFFSET_Y) + (sa_collider[1] * index),
+                    (self.size[0] * .16),
+                    self.size[1] * .29,
+                )
                 #  In brief :
                 #  Rect with bottomleft x value of sprite x position, plus 42% of the image width (image is small within
                 #  transparent larger image) plus sa_collider[0] - x value of normalised vector direction to collide
@@ -379,13 +395,20 @@ class Player_Sprite(Image):
                 #  Next values supplied to Rect are for y location, similar logic
                 #  Further values relate to the height/width of the rect instance which should envelope the inner
                 #  sprite drawing.  For the purposes of this calculation that's not so important.
-                newRect = Rect(self.pos[0]+(self.width*.42)+(sa_collider[0]*coltick), self.pos[1]+(self.height*.35)
-                                +(sa_collider[1]*coltick),(self.size[0]*.16), self.size[1]*.29)
+                newRect = Rect(
+                    self.pos[0] + (self.width * HITBOX_OFFSET_X) + (sa_collider[0] * coltick),
+                    self.pos[1] + (self.height * HITBOX_OFFSET_Y) + (sa_collider[1] * coltick),
+                    (self.size[0] * .16),
+                    self.size[1] * .29,
+                )
                 #  Multiply by coltick for newRect to ensure it's always 1 step ahead of lastRect
 
                 if self.move_or_collide(Rect1=newRect, Rect2=lastRect):
                     break
-            self.animcoords = newRect.bottomleft[0]-self.width*.42, newRect.bottomleft[1]-self.height*.35
+            self.animcoords = (
+                newRect.bottomleft[0] - self.width * HITBOX_OFFSET_X,
+                newRect.bottomleft[1] - self.height * HITBOX_OFFSET_Y,
+            )
             anim = Animation(x = self.animcoords[0], y = self.animcoords[1], duration=self.animduration)
             self.animlen = 0
             anim.start(self)
@@ -403,8 +426,12 @@ class Player_Sprite(Image):
         if Rect1 is not None:
             self.new = Rect1
         else:
-            self.new = Rect(self.pos[0]+(self.width*.42),self.pos[1]+(self.height*.35), (self.size[0]*.16),
-                            self.size[1]*.29)
+            self.new = Rect(
+                self.pos[0] + (self.width * HITBOX_OFFSET_X),
+                self.pos[1] + (self.height * HITBOX_OFFSET_Y),
+                (self.size[0] * .16),
+                self.size[1] * .29,
+            )
         if Rect2 is not None:
             self.last = Rect2
         """Rect instantiated with x set to where character drawing is, relative to the
@@ -431,7 +458,10 @@ class Player_Sprite(Image):
                 self.new.left = cell.right+1  # 1 pixel for padding, to prevent corner sticking
                 self.coldir = 'r'
                 blocked = True
-            self.pos = self.new.bottomleft[0]-self.width*.42, self.new.bottomleft[1]-self.height*.35
+            self.pos = (
+                self.new.bottomleft[0] - self.width * HITBOX_OFFSET_X,
+                self.new.bottomleft[1] - self.height * HITBOX_OFFSET_Y,
+            )
             self.posref = self.pos
         if blocked == True:
             return True
