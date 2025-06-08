@@ -89,6 +89,62 @@ class ZippyGame(FloatLayout):
         self.update_sprite()
         self.map.set_focus(*self.sprite.pos)
 
+    def _handle_input(self):
+        """Manage left and right movement based on keyboard state."""
+        if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) \
+                and not keys.get(Keyboard.keycodes['right']):
+            self.sprite.dx -= 5 * params.scale
+            self.sprite.moving_left = True
+            self.sprite.moving_right = False
+            self.sprite.texture = self.sprite.mov_images['walk_2_left'] if not self.sprite.jumping \
+                else self.sprite.mov_images['jump_l']
+            self.sprite.prevdir = 'left'
+        elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) \
+                and not keys.get(Keyboard.keycodes['left']):
+            self.sprite.dx += 5 * params.scale
+            self.sprite.moving_right = True
+            self.sprite.moving_left = False
+            self.sprite.texture = self.sprite.mov_images['walk_2_right'] if not self.sprite.jumping \
+                else self.sprite.mov_images['jump_r']
+            self.sprite.prevdir = 'right'
+        elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and \
+                (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])):
+            self.sprite.moving_left = False
+            self.sprite.moving_right = False
+
+    def _apply_gravity(self):
+        """Apply simple gravity when the sprite is not jumping."""
+        if not self.sprite.jumping:
+            self.sprite.dy -= 4 * params.scale
+
+    def _handle_jump(self):
+        """Manage jumping logic including initiation and peak handling."""
+        if self.sprite.jumping and not keys.get(Keyboard.keycodes['spacebar']):
+            self.sprite.jumping = False
+            self.sprite.movyval = 0
+
+        if keys.get(Keyboard.keycodes['spacebar']) and self.sprite.resting:
+            self.sprite.jumping = True
+            self.sprite.resting = False
+            self.sprite.dy = 5 * params.scale
+        elif keys.get(Keyboard.keycodes['spacebar']) and self.sprite.jumping:
+            if self.sprite.movyval > 20:
+                self.sprite.jumping = False
+                self.sprite.movyval = 0
+            else:
+                self.sprite.dy = 5 * params.scale
+                self.sprite.movyval += .5
+
+    def _handle_attack(self):
+        """Trigger attack animation when the attack key is pressed."""
+        if keys.get(Keyboard.keycodes['x']):
+            if self.sprite.atkcounter > 20:
+                self.sprite.atkcounter = 0
+            else:
+                self.sprite.texture = self.sprite.atk_images['attack2_l'] if self.sprite.prevdir == 'left' \
+                    else self.sprite.atk_images['attack2_r']
+                self.sprite.atkcounter += 1
+
     def update_sprite(self, *ignore):
         """
         main update method, handles character movement logic and animation updates
@@ -111,53 +167,11 @@ class ZippyGame(FloatLayout):
             # 'last' rect, before movement, for collision detection later on
             self.sprite.last = Rect(self.sprite.pos[0]+(self.sprite.width*.42),self.sprite.pos[1]+(self.sprite.height*.35), (self.sprite.size[0]*.16),
                              self.sprite.size[1]*.29)
-            # move left
-            if (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])) and not keys.get(Keyboard.keycodes['right']):
-                self.sprite.dx -= 5 * params.scale
-                self.sprite.moving_left = True
-                self.sprite.moving_right = False
-                self.sprite.texture = self.sprite.mov_images['walk_2_left'] if not self.sprite.jumping else self.sprite.mov_images['jump_l']
-                self.sprite.prevdir = 'left'
-            # move right
-            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and not keys.get(Keyboard.keycodes['left']):
-                self.sprite.dx += 5 * params.scale
-                self.sprite.moving_right = True
-                self.sprite.moving_left = False
-                self.sprite.texture = self.sprite.mov_images['walk_2_right'] if not self.sprite.jumping else self.sprite.mov_images['jump_r']
-                self.sprite.prevdir = 'right'
-            # if both keys pressed, do nothing
-            elif (keys.get(Keyboard.keycodes['right']) or keys.get(Keyboard.keycodes['d'])) and \
-                    (keys.get(Keyboard.keycodes['left']) or keys.get(Keyboard.keycodes['a'])):
-                self.sprite.moving_left, self.sprite.moving_right = False,False
-            # rudimentary gravity
-            if not self.sprite.jumping:
-                self.sprite.dy -= 4 * params.scale
-            # if we were jumping, but have released the key
-            if self.sprite.jumping:
-                if not keys.get(Keyboard.keycodes['spacebar']):
-                    self.sprite.jumping = False
-                    self.sprite.movyval = 0
-            # initiate attack animation
-            if keys.get(Keyboard.keycodes['x']):
-                if self.sprite.atkcounter > 20:
-                    self.sprite.atkcounter = 0
-                else:
-                    self.sprite.texture = self.sprite.atk_images['attack2_l'] if self.sprite.prevdir == 'left' \
-                        else self.sprite.atk_images['attack2_r']
-                    self.sprite.atkcounter += 1
-            # initiate a jump
-            if keys.get(Keyboard.keycodes['spacebar']) and self.sprite.resting:
-                self.sprite.jumping = True
-                self.sprite.resting = False
-                self.sprite.dy = 5 * params.scale
-            # there's a peak to every jump, after which, no more vertical movement
-            elif keys.get(Keyboard.keycodes['spacebar']) and self.sprite.jumping:
-                if self.sprite.movyval > 20:
-                    self.sprite.jumping = False
-                    self.sprite.movyval = 0
-                else:
-                    self.sprite.dy = 5 * params.scale
-                    self.sprite.movyval += .5
+            # movement, gravity and other input
+            self._handle_input()
+            self._apply_gravity()
+            self._handle_jump()
+            self._handle_attack()
             # update the sprite x/y
             self.sprite.x += self.sprite.dx
             self.sprite.y += self.sprite.dy
