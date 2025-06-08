@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zipper"
+version = "0.1.0"
+description = "Zipper - Action Adventure Platform game implemented in Kivy"
+authors = [{name = "Unknown"}]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+dependencies = [
+    "kivy>=2.0.0"
+]
+
+[tool.setuptools]
+packages = ["zipper"]
+include-package-data = true
+
+[project.scripts]
+zipper = "zipper.__main__:main"
