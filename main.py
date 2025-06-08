@@ -1,5 +1,5 @@
 import time
-import pdb
+import logging
 import sys
 import os
 from kivy.app import App
@@ -69,13 +69,13 @@ class BaseMap(tmx.TileMapWidget):
 
 class ZippyGame(FloatLayout):
     def __init__(self,**kwargs):
-        self.baseimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','enbar_noback.png'))
-        self.hpimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','hbar.png'))
-        self.mpimg = os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','mpbar.png'))
+        self.baseimg = os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'effects', 'enbar_noback.png'))
+        self.hpimg = os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'effects', 'hbar.png'))
+        self.mpimg = os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'effects', 'mpbar.png'))
 
         super(ZippyGame,self).__init__(**kwargs)
         tempscale = Window.height / 256.
-        self.map = BaseMap(os.path.abspath(os.path.join(os.path.dirname('__file__'),'Maps','prototype1','16px-680x800-metal.tmx')),
+        self.map = BaseMap(os.path.abspath(os.path.join(os.path.dirname(__file__), 'Maps', 'prototype1', '16px-680x800-metal.tmx')),
             Window.size,tempscale)
         spawn = self.map.map.layers['start'].find('spawn')[0]
         self.zipmeter = ZipMeter()
@@ -184,11 +184,11 @@ class Player_Sprite(Image):
     def __init__(self,pos,mapz):
         super(Player_Sprite,self).__init__(pos=pos,size=(195,164))
         #  (pos=pos, size=(192,81),*kwargs)
-        self.mov_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','movement','animatlas.atlas')))
-        self.atk_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','attack','atk.atlas')))
-        self.spe_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','special','specatlas.atlas')))
-        self.wall_images = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','special','wall_anim','wall.atlas')))
-        self.animage = Atlas(os.path.abspath(os.path.join(os.path.dirname('__file__'),'animation','effects','arrow.atlas')))
+        self.mov_images = Atlas(os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'movement', 'animatlas.atlas')))
+        self.atk_images = Atlas(os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'attack', 'atk.atlas')))
+        self.spe_images = Atlas(os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'special', 'specatlas.atlas')))
+        self.wall_images = Atlas(os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'special', 'wall_anim', 'wall.atlas')))
+        self.animage = Atlas(os.path.abspath(os.path.join(os.path.dirname(__file__), 'animation', 'effects', 'arrow.atlas')))
         self.map = mapz
         self.texture = self.mov_images['walk_2_right']
         self.moving_right = False
